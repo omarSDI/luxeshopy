@@ -22,6 +22,9 @@ CREATE TABLE products (
     sizes JSONB DEFAULT '[]'::jsonb, 
     color VARCHAR(50),
     stock INTEGER DEFAULT 100,
+    compare_at_price DECIMAL(10, 2) DEFAULT 0,
+    cost_price DECIMAL(10, 2) DEFAULT 0,
+    image_type VARCHAR(20) DEFAULT 'url',
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
