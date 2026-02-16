@@ -1,4 +1,10 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="64" height="64" rx="16" fill="#0A0A0A"/>
-  <path d="M12 44H52V40H12V44ZM52 36L44.5 24L32 36L19.5 24L12 36V22L20.6667 31L32 18L43.3333 31L52 22V36Z" fill="#D4AF37"/>
+  <!-- Bag Handle -->
+  <path d="M22 24C22 18.4772 26.4772 14 32 14C37.5228 14 42 18.4772 42 24V28H40V24C40 19.5817 36.4183 16 32 16C27.5817 16 24 19.5817 24 24V28H22V24Z" fill="#D4AF37"/>
+  <!-- Bag Body -->
+  <path d="M18 28H46L49 54H15L18 28Z" fill="#D4AF37"/>
+  <!-- Smartphone outline -->
+  <rect x="26" y="34" width="12" height="16" rx="2" stroke="#0A0A0A" stroke-width="1.5"/>
+  <rect x="30" y="35" width="4" height="0.5" rx="0.25" fill="#0A0A0A"/>
 </svg>

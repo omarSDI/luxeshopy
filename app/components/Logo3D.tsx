@@ -58,8 +58,14 @@ export default function Logo3D() {
                 className="flex items-center gap-3"
             >
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#0a0a0a] to-[#1a1a1a] rounded-xl flex items-center justify-center shadow-2xl border border-[#D4AF37]/30 group-hover:border-[#D4AF37] transition-colors">
-                    <svg viewBox="0 0 64 64" className="w-6 h-6 sm:w-8 sm:h-8 text-[#D4AF37] fill-current">
-                        <path d="M12 44H52V40H12V44ZM52 36L44.5 24L32 36L19.5 24L12 36V22L20.6667 31L32 18L43.3333 31L52 22V36Z" />
+                    <svg viewBox="0 0 64 64" className="w-6 h-6 sm:w-8 sm:h-8">
+                        {/* Bag Handle */}
+                        <path d="M22 24C22 18.4772 26.4772 14 32 14C37.5228 14 42 18.4772 42 24V28H40V24C40 19.5817 36.4183 16 32 16C27.5817 16 24 19.5817 24 24V28H22V24Z" fill="#D4AF37" />
+                        {/* Bag Body */}
+                        <path d="M18 28H46L49 54H15L18 28Z" fill="#D4AF37" />
+                        {/* Smartphone outline */}
+                        <rect x="26" y="34" width="12" height="16" rx="2" stroke="#0a0a0a" strokeWidth="1.5" fill="none" />
+                        <rect x="30" y="35" width="4" height="0.5" rx="0.25" fill="#0a0a0a" />
                     </svg>
                 </div>
                 <span className="text-2xl sm:text-3xl font-black tracking-tighter text-[#D4AF37]" style={{ fontFamily: 'Playfair Display, serif' }}>
