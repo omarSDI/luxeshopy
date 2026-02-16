@@ -42,7 +42,7 @@ export default function TrustSignals() {
           className="text-center mb-12"
         >
           <h2
-            className="text-3xl md:text-4xl font-bold text-[#001f3f] mb-4"
+            className="text-3xl md:text-4xl font-bold text-[#0a0a0a] mb-4"
             style={{ fontFamily: 'Playfair Display, serif' }}
           >
             Why Choose LuxeShopy?
@@ -67,7 +67,7 @@ export default function TrustSignals() {
                   <Icon className="w-8 h-8 text-white" />
                 </div>
                 <h3
-                  className="text-xl font-bold text-[#001f3f] mb-2"
+                  className="text-xl font-bold text-[#0a0a0a] mb-2"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
                   {feature.title}

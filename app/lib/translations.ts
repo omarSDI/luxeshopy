@@ -4,16 +4,17 @@ export const translations = {
     en: {
         // Navbar
         shop: 'Shop',
-        men: 'Men',
-        women: 'Women',
+        newTech: 'New Tech',
+        wearables: 'Wearables',
+        accessories: 'Accessories',
         contact: 'Contact',
         search: 'Search',
         cart: 'Cart',
 
         // Hero
-        heroTitle: 'Elevate Your',
-        heroReview: 'Walk',
-        heroSubtitle: 'Discover premium quality footwear designed for style and comfort. Step into excellence with LuxeShopy.',
+        heroTitle: 'The Future on',
+        heroReview: 'Your Wrist',
+        heroSubtitle: 'Experience the next generation of high-end electronics. Innovation, precision, and luxury in every detail.',
         shopNow: 'Shop Now',
         exploreCollection: 'Explore Collection',
         premiumFootwear: 'Premium Footwear',
@@ -138,16 +139,17 @@ export const translations = {
     fr: {
         // Navbar
         shop: 'Boutique',
-        men: 'Hommes',
-        women: 'Femmes',
+        newTech: 'Nouvelle Tech',
+        wearables: 'Connectés',
+        accessories: 'Accessoires',
         contact: 'Contact',
         search: 'Rechercher',
         cart: 'Panier',
 
         // Hero
-        heroTitle: 'Élevez Votre',
-        heroReview: 'Marche',
-        heroSubtitle: 'Découvrez des chaussures de qualité premium conçues pour le style et le confort. L\'excellence avec LuxeShopy.',
+        heroTitle: 'Le Futur à',
+        heroReview: 'Votre Poignet',
+        heroSubtitle: 'Découvrez la nouvelle génération d\'électronique haut de gamme. Innovation, précision et luxe dans chaque détail.',
         shopNow: 'Acheter',
         exploreCollection: 'Voir la Collection',
         premiumFootwear: 'Chaussures Premium',
@@ -273,16 +275,17 @@ export const translations = {
     ar: {
         // Navbar
         shop: 'المتجر',
-        men: 'رجال',
-        women: 'نساء',
+        newTech: 'تكنولوجيا جديدة',
+        wearables: 'أجهزة ملبوسة',
+        accessories: 'إكسسوارات',
         contact: 'اتصل بنا',
         search: 'بحث',
         cart: 'السلة',
 
         // Hero
-        heroTitle: 'ارفع مستوى',
-        heroReview: 'خطواتك',
-        heroSubtitle: 'اكتشف أحذية عالية الجودة مصممة للأناقة والراحة. تميز مع لوكس شوبي.',
+        heroTitle: 'المستقبل على',
+        heroReview: 'معصمك',
+        heroSubtitle: 'اكتشف الجيل القادم من الإلكترونيات عالية الجودة. الابتكار والدقة والفخامة في كل التفاصيل.',
         shopNow: 'تسوق الآن',
         exploreCollection: 'استكشف المجموعة',
         premiumFootwear: 'أحذية فاخرة',

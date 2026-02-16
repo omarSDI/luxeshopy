@@ -44,7 +44,7 @@ export default function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full bg-white/95 backdrop-blur-md border-b-2 border-[#D4AF37]/30 shadow-lg"
+        className="w-full bg-white/60 backdrop-blur-xl border-b border-[#D4AF37]/20 shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-24">
@@ -57,8 +57,9 @@ export default function Navbar() {
             <div className="hidden md:flex items-center space-x-10">
               {[
                 { href: '/shop', label: t('shop') },
-                { href: '/category/men', label: t('men') },
-                { href: '/category/women', label: t('women') },
+                { href: '/category/new-tech', label: t('newTech') },
+                { href: '/category/wearables', label: t('wearables') },
+                { href: '/category/accessories', label: t('accessories') },
                 { href: '/contact', label: t('contact') },
               ].map((link, index) => (
                 <Link
@@ -125,8 +126,9 @@ export default function Navbar() {
               <div className="flex flex-col space-y-3">
                 {[
                   { href: '/shop', label: t('shop') },
-                  { href: '/category/men', label: t('men') },
-                  { href: '/category/women', label: t('women') },
+                  { href: '/category/new-tech', label: t('newTech') },
+                  { href: '/category/wearables', label: t('wearables') },
+                  { href: '/category/accessories', label: t('accessories') },
                   { href: '/contact', label: t('contact') },
                 ].map((link) => (
                   <Link
