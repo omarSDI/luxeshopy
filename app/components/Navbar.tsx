@@ -64,7 +64,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="relative text-[#001f3f] hover:text-[#d4af37] transition-colors font-medium text-sm uppercase tracking-wider group"
+                  className="relative text-[#0a0a0a] hover:text-[#d4af37] transition-colors font-medium text-sm uppercase tracking-wider group"
                 >
                   {link.label}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#d4af37] group-hover:w-full transition-all duration-300"></span>
@@ -83,7 +83,7 @@ export default function Navbar() {
               >
                 <button
                   onClick={toggleCart}
-                  className="relative p-3 text-[#001f3f] hover:text-[#d4af37] transition-colors rounded-full hover:bg-[#d4af37]/10"
+                  className="relative p-3 text-[#0a0a0a] hover:text-[#d4af37] transition-colors rounded-full hover:bg-[#d4af37]/10"
                   aria-label="Open shopping cart"
                 >
                   <ShoppingCart className="w-6 h-6" />
@@ -91,7 +91,7 @@ export default function Navbar() {
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#d4af37] text-xs font-bold text-[#001f3f] shadow-lg"
+                      className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#d4af37] text-xs font-bold text-[#0a0a0a] shadow-lg"
                     >
                       {cartCount}
                     </motion.span>
@@ -102,7 +102,7 @@ export default function Navbar() {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 text-[#001f3f] hover:text-[#d4af37] transition-colors rounded-lg hover:bg-[#d4af37]/10"
+                className="md:hidden p-2 text-[#0a0a0a] hover:text-[#d4af37] transition-colors rounded-lg hover:bg-[#d4af37]/10"
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? (
@@ -133,7 +133,7 @@ export default function Navbar() {
                     key={link.href}
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-3 text-[#001f3f] hover:text-[#d4af37] hover:bg-[#d4af37]/10 transition-colors font-medium rounded-lg uppercase tracking-wider"
+                    className="block px-4 py-3 text-[#0a0a0a] hover:text-[#d4af37] hover:bg-[#d4af37]/10 transition-colors font-medium rounded-lg uppercase tracking-wider"
                   >
                     {link.label}
                   </Link>
