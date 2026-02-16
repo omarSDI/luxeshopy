@@ -1,12 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function Hero() {
   const { t } = useLanguage();
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const heroImage = "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?auto=format&fit=crop&q=80&w=1200";
   return (
     <section className="relative w-full bg-gradient-to-br from-[#0a0a0a] via-[#0a0a0a] to-[#1a1a1a] overflow-hidden">
       {/* Circuit Board Pattern Overlay */}
@@ -78,42 +83,55 @@ export default function Hero() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.2 }}
-            className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center"
+            className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center p-4"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/20 to-transparent rounded-3xl blur-3xl opacity-50 animate-pulse"></div>
-            <div className="relative h-full w-full flex items-center justify-center">
-              <motion.div
-                animate={{
-                  y: [0, -20, 0],
-                  rotateY: [0, 360],
-                }}
-                transition={{
-                  y: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-                  rotateY: { duration: 15, repeat: Infinity, ease: 'linear' },
-                }}
-                className="relative z-10 w-full h-full flex items-center justify-center"
-                style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=1200"
-                  alt="High-End Smartwatch"
-                  className="w-full h-full object-contain drop-shadow-[0_35px_35px_rgba(212,175,55,0.4)] relative z-20"
-                  style={{ minHeight: '300px' }}
-                />
-              </motion.div>
 
-              {/* Futuristic Orbit Elements */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border border-[#d4af37]/10 rounded-full"
-              />
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] border border-[#d4af37]/5 rounded-full"
-              />
-            </div>
+            <AnimatePresence>
+              {!imageError ? (
+                <motion.div
+                  key="image"
+                  animate={{
+                    y: [0, -20, 0],
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                  className="relative z-10 w-full h-full flex items-center justify-center"
+                >
+                  <img
+                    src={heroImage}
+                    alt="High-End Smartwatch"
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageError(true)}
+                    className={`max-w-[85%] max-h-[85%] object-contain drop-shadow-[0_35px_35px_rgba(212,175,55,0.4)] transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                  />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="fallback"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="relative z-10 w-64 h-64 sm:w-80 sm:h-80 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-full border-4 border-[#d4af37]/30 flex items-center justify-center shadow-[0_0_50px_rgba(212,175,55,0.2)]"
+                >
+                  <div className="text-center p-6">
+                    <div className="text-[#d4af37] text-4xl mb-2 font-black">LX</div>
+                    <div className="text-gray-400 text-xs uppercase tracking-widest font-bold">Premium Wearable</div>
+                  </div>
+                  {/* Digital glow */}
+                  <div className="absolute inset-0 rounded-full bg-[#d4af37]/5 animate-pulse"></div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Futuristic Orbit Elements */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border border-[#d4af37]/10 rounded-full"
+            />
           </motion.div>
         </div>
       </div>
