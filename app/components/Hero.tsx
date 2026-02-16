@@ -13,64 +13,91 @@ export default function Hero() {
 
   const heroImage = "https://images.unsplash.com/photo-1510017803434-a899398421b3?auto=format&fit=crop&q=80&w=1200";
   return (
-    <section className="relative w-full bg-gradient-to-br from-[#0a0a0a] via-[#0a0a0a] to-[#1a1a1a] overflow-hidden">
-      {/* Circuit Board Pattern Overlay */}
-      <div className="absolute inset-0 circuit-board opacity-[0.03] z-0 pointer-events-none"></div>
+    <section className="relative w-full min-h-screen bg-[#060a16] flex items-center overflow-hidden">
+      {/* World-Class Tech Background */}
+      <div className="absolute inset-0 tech-grid z-0"></div>
 
-      {/* Decorative Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl"></div>
+      {/* Animated Glowing Lines */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="glow-line" style={{ left: '10%', opacity: 0.1 }}></div>
+        <div className="glow-line" style={{ left: '40%', opacity: 0.15, animationDelay: '2s' }}></div>
+        <div className="glow-line" style={{ left: '70%', opacity: 0.1, animationDelay: '5s' }}></div>
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 lg:py-40 z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* Floating Particles */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="particle"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              '--duration': `${10 + Math.random() * 20}s`
+            } as any}
+          ></div>
+        ))}
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 z-10 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Text Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className="text-center lg:text-left space-y-8"
+            className="text-center lg:text-left space-y-10"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#d4af37]/20 rounded-full mb-4">
-              <Sparkles className="w-4 h-4 text-[#d4af37]" />
-              <span className="text-sm font-semibold text-[#d4af37] uppercase tracking-wider">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="inline-flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-[#d4af37]/20 to-[#0d121f] rounded-full border border-[#d4af37]/30 backdrop-blur-md"
+            >
+              <Sparkles className="w-4 h-4 text-[#d4af37] animate-pulse" />
+              <span className="text-xs font-bold text-[#d4af37] uppercase tracking-[0.2em]">
                 {t('newTech')}
               </span>
-            </div>
+            </motion.div>
 
             <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight"
+              className="text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tighter"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
               {t('heroTitle')}
-              <span className="block text-[#d4af37] mt-2">{t('heroReview')}</span>
+              <span className="block bg-gradient-to-r from-[#d4af37] via-[#f9c94d] to-[#b8941e] bg-clip-text text-transparent mt-4">
+                {t('heroReview')}
+              </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-gray-300 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed font-light">
               {t('heroSubtitle')}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <Link
                   href="/shop"
-                  className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#d4af37] to-[#b8941e] text-[#0a0a0a] font-bold rounded-lg hover:shadow-2xl hover:shadow-[#d4af37]/50 transition-all duration-300"
+                  className="group relative inline-flex items-center gap-4 px-10 py-5 bg-[#d4af37] text-[#060a16] font-black rounded-sm overflow-hidden transition-all duration-500 hover:shadow-[0_0_40px_rgba(212,175,55,0.4)]"
                 >
-                  {t('shopNow')}
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <span className="relative z-10 flex items-center gap-2">
+                    {t('shopNow')}
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform duration-300" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#f9c94d] to-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </Link>
               </motion.div>
+
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.98 }}
               >
                 <Link
                   href="/category/wearables"
-                  className="inline-flex items-center gap-3 px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:border-[#d4af37] hover:bg-[#d4af37]/10 transition-all duration-300"
+                  className="inline-flex items-center gap-4 px-10 py-5 border border-[#d4af37]/40 text-white font-bold rounded-sm backdrop-blur-sm hover:bg-[#d4af37]/10 hover:border-[#d4af37] transition-all duration-500"
                 >
                   {t('exploreCollection')}
                 </Link>
@@ -78,78 +105,79 @@ export default function Hero() {
             </div>
           </motion.div>
 
-          {/* 3D Smartwatch with Rotation & Float */}
+          {/* 3D Vertical Watch Refinement */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="relative w-full h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center p-4"
+            transition={{ duration: 1.2, ease: 'circOut' }}
+            className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center p-8"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/20 to-transparent rounded-3xl blur-3xl opacity-50 animate-pulse"></div>
+            {/* Dynamic Halo */}
+            <div className="absolute w-[80%] h-[80%] bg-gradient-to-r from-[#d4af37]/20 to-transparent rounded-full blur-[120px] opacity-30 animate-pulse"></div>
 
             <AnimatePresence>
               {!imageError ? (
                 <motion.div
                   key="image"
                   animate={{
-                    y: [0, -20, 0],
+                    y: [0, -30, 0],
+                    rotateY: 360,
                   }}
                   transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
+                    y: { duration: 6, repeat: Infinity, ease: 'easeInOut' },
+                    rotateY: { duration: 20, repeat: Infinity, ease: 'linear' },
                   }}
+                  whileHover={{ scale: 1.1, cursor: 'pointer' }}
                   className="relative z-10 w-full h-full flex items-center justify-center"
+                  style={{ transformStyle: 'preserve-3d', perspective: '1200px' }}
                 >
-                  <img
-                    src={heroImage}
-                    alt="High-End Smartwatch"
-                    onLoad={() => setImageLoaded(true)}
-                    onError={() => setImageError(true)}
-                    className="max-w-[85%] max-h-[85%] object-contain drop-shadow-[0_35px_35px_rgba(212,175,55,0.5)] transition-opacity duration-700 opacity-100"
-                  />
+                  {/* The Watch - Standing Vertical 3D */}
+                  <div className="relative transform-gpu flex items-center justify-center">
+                    <img
+                      src={heroImage}
+                      alt="High-End Smartwatch"
+                      onLoad={() => setImageLoaded(true)}
+                      onError={() => setImageError(true)}
+                      className={`max-w-[75%] max-h-[75%] object-contain drop-shadow-[0_50px_60px_rgba(0,0,0,0.8)] transition-all duration-1000 ${imageLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
+                      style={{
+                        filter: 'contrast(1.1) brightness(1.1)',
+                        transform: 'rotateZ(0deg)' // Ensure vertical standing
+                      }}
+                    />
+
+                    {/* Shadow reacting to watch position */}
+                    <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-48 h-8 bg-black/40 blur-2xl rounded-full scale-x-150 opacity-60"></div>
+                  </div>
                 </motion.div>
               ) : (
                 <motion.div
                   key="fallback"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="relative z-10 w-64 h-64 sm:w-80 sm:h-80 bg-gradient-to-br from-[#1a1a1a] to-[#0a0a0a] rounded-full border-4 border-[#d4af37]/30 flex items-center justify-center shadow-[0_0_50px_rgba(212,175,55,0.2)]"
+                  className="relative z-10 w-80 h-80 bg-gradient-to-br from-[#0d121f] to-[#060a16] rounded-3xl border border-[#d4af37]/30 flex items-center justify-center shadow-[0_0_80px_rgba(212,175,55,0.15)]"
                 >
-                  <div className="text-center p-6">
-                    <div className="text-[#d4af37] text-4xl mb-2 font-black">LX</div>
-                    <div className="text-gray-400 text-xs uppercase tracking-widest font-bold">Premium Wearable</div>
+                  <div className="text-center">
+                    <div className="text-[#d4af37] text-6xl mb-4 font-black tracking-tighter">LX</div>
+                    <div className="text-gray-500 text-xs uppercase tracking-[0.4em] font-bold">Ultra Tech</div>
                   </div>
-                  {/* Digital glow */}
-                  <div className="absolute inset-0 rounded-full bg-[#d4af37]/5 animate-pulse"></div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Futuristic Orbit Elements */}
+            {/* Futuristic Tech Orbits */}
             <motion.div
               animate={{ rotate: 360 }}
-              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] border border-[#d4af37]/10 rounded-full"
+              transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+              className="absolute w-[105%] h-[105%] border-[0.5px] border-[#d4af37]/10 rounded-full"
+            />
+            <motion.div
+              animate={{ rotate: -360 }}
+              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+              className="absolute w-[95%] h-[95%] border-[0.5px] border-[#d4af37]/5 rounded-full"
             />
           </motion.div>
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-      >
-        <div className="w-6 h-10 border-2 border-[#d4af37]/50 rounded-full flex items-start justify-center p-2">
-          <motion.div
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-1.5 h-1.5 bg-[#d4af37] rounded-full"
-          />
-        </div>
-      </motion.div>
     </section>
   );
 }
