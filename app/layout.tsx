@@ -38,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+    <html lang="ar" dir="rtl" className="scroll-smooth" suppressHydrationWarning>
       <body className="antialiased">
         <ThemeProvider>
           <LanguageProvider>

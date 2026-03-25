@@ -5,17 +5,19 @@ import { Search, Filter, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { Product } from '@/lib/types';
 import ProductCard from '../components/ProductCard';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ShopClientProps {
     products: Product[];
 }
 
 export default function ShopClient({ products }: ShopClientProps) {
+    const { t, dir } = useLanguage();
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedCategory, setSelectedCategory] = useState('all');
     const [sortBy, setSortBy] = useState('newest');
 
-    const categories = ['All', 'Men', 'Women', 'Accessories', 'New Arrivals'];
+    const categories = ['all', 'men', 'women', 'accessories', 'newArrivals'];
 
     const filteredProducts = useMemo(() => {
         let result = [...products];
@@ -39,8 +41,8 @@ export default function ShopClient({ products }: ShopClientProps) {
         }
 
         // 2. Category filter (Secondary)
-        if (selectedCategory !== 'All') {
-            result = result.filter(p => p.category?.toLowerCase() === selectedCategory.toLowerCase());
+        if (selectedCategory !== 'all') {
+            result = result.filter(p => p.category?.toLowerCase() === t(selectedCategory).toLowerCase() || p.category?.toLowerCase() === selectedCategory);
         }
 
         // 3. Sort
@@ -51,11 +53,11 @@ export default function ShopClient({ products }: ShopClientProps) {
         }
 
         return result;
-    }, [products, searchQuery, selectedCategory, sortBy]);
+    }, [products, searchQuery, selectedCategory, sortBy, t]);
 
     // Check if search would return results in other categories
     const resultsInOtherCategories = useMemo(() => {
-        if (!searchQuery || selectedCategory === 'All') return 0;
+        if (!searchQuery || selectedCategory === 'all') return 0;
 
         const query = searchQuery.toLowerCase().trim();
         return products.filter(p => {
@@ -64,22 +66,36 @@ export default function ShopClient({ products }: ShopClientProps) {
                 (p.category || '').toLowerCase().includes(query) ||
                 (p.color || '').toLowerCase().includes(query) ||
                 String(p.id || '').toLowerCase().includes(query);
-            return matchesSearch && p.category?.toLowerCase() !== selectedCategory.toLowerCase();
+            return matchesSearch && p.category?.toLowerCase() !== t(selectedCategory).toLowerCase() && p.category?.toLowerCase() !== selectedCategory;
         }).length;
-    }, [products, searchQuery, selectedCategory]);
+    }, [products, searchQuery, selectedCategory, t]);
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+            {/* Page Header */}
+            <div className="text-center py-16">
+                <h1
+                    className="text-4xl md:text-5xl font-bold text-[#001f3f] mb-4"
+                    style={{ fontFamily: 'Playfair Display, serif' }}
+                >
+                    {t('luxuryCollection')}
+                </h1>
+                <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent mx-auto"></div>
+                <p className="mt-6 text-gray-600 text-lg">
+                    {t('shopSubtitle')}
+                </p>
+            </div>
+
             {/* Filter Bar */}
             <div className="sticky top-20 z-30 bg-white/80 backdrop-blur-md rounded-2xl border border-gray-100 shadow-lg p-4 mb-12 flex flex-col md:flex-row gap-4 items-center justify-between">
                 <div className="relative w-full md:w-96">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Search className={`absolute ${dir === 'rtl' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400`} />
                     <input
                         type="text"
-                        placeholder="Search for luxury footwear..."
+                        placeholder={t('searchPlaceholder')}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-[#d4af37]/20 outline-none text-[#001f3f] font-medium transition-all"
+                        className={`w-full ${dir === 'rtl' ? 'pr-12 pl-4' : 'pl-12 pr-4'} py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-[#d4af37]/20 outline-none text-[#001f3f] font-medium transition-all`}
                     />
                 </div>
 
@@ -94,7 +110,7 @@ export default function ShopClient({ products }: ShopClientProps) {
                                     : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
                                     }`}
                             >
-                                {cat}
+                                {t(cat)}
                             </button>
                         ))}
                     </div>
@@ -106,9 +122,9 @@ export default function ShopClient({ products }: ShopClientProps) {
                         onChange={(e) => setSortBy(e.target.value)}
                         className="bg-gray-50 text-[#001f3f] text-sm font-bold py-2.5 px-4 rounded-lg outline-none cursor-pointer hover:bg-gray-100 transition-colors border-none focus:ring-2 focus:ring-[#d4af37]/20"
                     >
-                        <option value="newest">Newest</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
+                        <option value="newest">{t('newest')}</option>
+                        <option value="price-low">{t('priceLow')}</option>
+                        <option value="price-high">{t('priceHigh')}</option>
                     </select>
                 </div>
             </div>
@@ -133,26 +149,26 @@ export default function ShopClient({ products }: ShopClientProps) {
                         <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
                             <SlidersHorizontal className="w-8 h-8 text-gray-300" />
                         </div>
-                        <h3 className="text-2xl font-bold text-[#001f3f] mb-2">No items found</h3>
+                        <h3 className="text-2xl font-bold text-[#001f3f] mb-2">{t('noItemsFound')}</h3>
                         <p className="text-gray-500 max-w-xs mx-auto mb-6">
-                            We couldn't find any products matching your current filters.
+                            {t('noItemsMatching')}
                         </p>
 
                         <div className="flex flex-col items-center gap-4">
                             {resultsInOtherCategories > 0 && (
                                 <button
-                                    onClick={() => setSelectedCategory('All')}
+                                    onClick={() => setSelectedCategory('all')}
                                     className="px-6 py-3 bg-[#001f3f] text-[#d4af37] rounded-xl font-bold shadow-lg hover:scale-105 transition-transform"
                                 >
-                                    Show {resultsInOtherCategories} results in other categories
+                                    {t('showResultsInOther')} ({resultsInOtherCategories})
                                 </button>
                             )}
 
                             <button
-                                onClick={() => { setSearchQuery(''); setSelectedCategory('All'); }}
+                                onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
                                 className="text-sm font-bold text-gray-400 hover:text-[#d4af37] transition-colors"
                             >
-                                Clear all filters
+                                {t('clearFilters')}
                             </button>
                         </div>
                     </motion.div>

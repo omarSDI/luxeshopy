@@ -6,14 +6,15 @@ import { translations, Language } from '../lib/translations';
 interface LanguageContextType {
     language: Language;
     setLanguage: (lang: Language) => void;
-    t: (key: keyof typeof translations.en) => string;
+    t: (key: string) => string;
     isRTL: boolean;
+    dir: 'rtl' | 'ltr';
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-    const [language, setLanguage] = useState<Language>('en');
+    const [language, setLanguage] = useState<Language>('ar');
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -24,23 +25,26 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         setMounted(true);
     }, []);
 
+    const dir = language === 'ar' ? 'rtl' : 'ltr';
+
     useEffect(() => {
         if (mounted) {
             localStorage.setItem('language', language);
-            document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+            document.documentElement.dir = dir;
             document.documentElement.lang = language;
         }
-    }, [language, mounted]);
+    }, [language, mounted, dir]);
 
-    const t = (key: keyof typeof translations.en) => {
+    const t = (key: string) => {
         const langData = translations[language] || translations['en'];
-        return langData[key] || translations['en'][key] || key;
+        const translation = (langData as any)[key] || (translations['en'] as any)[key];
+        return translation || key;
     };
 
     const isRTL = language === 'ar';
 
     return (
-        <LanguageContext.Provider value={{ language, setLanguage, t, isRTL }}>
+        <LanguageContext.Provider value={{ language, setLanguage, t, isRTL, dir }}>
             {mounted ? children : <div className="invisible">{children}</div>}
         </LanguageContext.Provider>
     );

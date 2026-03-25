@@ -7,8 +7,10 @@ import { motion } from 'framer-motion';
 import { useCartStore } from '../store/cartStore';
 import { createOrder } from '@/app/actions/orders';
 import { ShoppingBag, Lock, CheckCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function CheckoutForm() {
+  const { t, dir } = useLanguage();
   const router = useRouter();
   const items = useCartStore((s) => s.items);
   const total = useCartStore((s) => s.getTotalPrice());
@@ -39,11 +41,11 @@ export default function CheckoutForm() {
 
     // Validation checks with clear messages
     const validationErrors = [];
-    if (name.trim().length < 2) validationErrors.push("Name is too short");
-    if (phone.trim().length < 8) validationErrors.push("Phone number must be at least 8 digits");
-    if (street.trim().length < 3) validationErrors.push("Street address is too short");
-    if (city.trim().length < 2) validationErrors.push("City name is too short");
-    if (governorate === '') validationErrors.push("Please select a governorate");
+    if (name.trim().length < 2) validationErrors.push(t('nameShort'));
+    if (phone.trim().length < 8) validationErrors.push(t('phoneLength'));
+    if (street.trim().length < 3) validationErrors.push(t('streetShort'));
+    if (city.trim().length < 2) validationErrors.push(t('cityShort'));
+    if (governorate === '') validationErrors.push(t('selectGov'));
 
     if (validationErrors.length > 0) {
       setError(validationErrors.join('. '));
@@ -85,14 +87,14 @@ export default function CheckoutForm() {
           className="text-2xl font-bold text-[#001f3f] mb-2"
           style={{ fontFamily: 'Playfair Display, serif' }}
         >
-          Your cart is empty
+          {t('cartEmpty')}
         </h2>
-        <p className="text-gray-600 mb-6">Add premium products before checking out.</p>
+        <p className="text-gray-600 mb-6">{t('cartEmptySub')}</p>
         <Link
           href="/shop"
           className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-[#001f3f] to-[#001f3f] hover:from-[#d4af37] hover:to-[#b8941e] text-white hover:text-[#001f3f] rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
         >
-          Go to Shop
+          {t('returnHome')}
         </Link>
       </motion.div>
     );
@@ -101,10 +103,10 @@ export default function CheckoutForm() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
       <motion.form
-        initial={{ opacity: 0, x: -20 }}
+        initial={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
         animate={{ opacity: 1, x: 0 }}
         onSubmit={onSubmit}
-        className="lg:col-span-3 rounded-2xl border-2 border-[#d4af37]/20 p-8 bg-white shadow-xl"
+        className="lg:col-span-3 rounded-2xl border-2 border-[#d4af37]/20 p-8 bg-white shadow-xl text-start"
       >
         <div className="flex items-center gap-3 mb-6">
           <div className="p-3 bg-gradient-to-br from-[#001f3f] to-[#003366] rounded-lg">
@@ -115,10 +117,10 @@ export default function CheckoutForm() {
               className="text-3xl font-bold text-[#001f3f]"
               style={{ fontFamily: 'Playfair Display, serif' }}
             >
-              Checkout
+              {t('checkout')}
             </h2>
             <p className="text-gray-600 text-sm mt-1">
-              Enter your details to complete your order
+              {t('enterDetails')}
             </p>
           </div>
         </div>
@@ -126,26 +128,26 @@ export default function CheckoutForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="md:col-span-1">
             <label className="block text-sm font-semibold text-[#001f3f] mb-2">
-              Full Name <span className="text-[#d4af37]">*</span>
+              {t('fullName')} <span className="text-[#d4af37]">*</span>
             </label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full rounded-lg border-2 border-[#d4af37]/30 px-4 py-3 outline-none focus:border-[#d4af37] transition-colors"
-              placeholder="Your full name"
+              placeholder={t('name')}
               required
             />
           </div>
 
           <div className="md:col-span-1">
             <label className="block text-sm font-semibold text-[#001f3f] mb-2">
-              Phone Number <span className="text-[#d4af37]">*</span>
+              {t('phoneNumber')} <span className="text-[#d4af37]">*</span>
             </label>
             <input
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full rounded-lg border-2 border-[#d4af37]/30 px-4 py-3 outline-none focus:border-[#d4af37] transition-colors"
-              placeholder="Ex: 55 123 456"
+              placeholder={t('phonePlaceholder')}
               required
             />
           </div>
@@ -154,13 +156,13 @@ export default function CheckoutForm() {
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-[#001f3f] mb-2">
-              Street Address <span className="text-[#d4af37]">*</span>
+              {t('streetAddress')} <span className="text-[#d4af37]">*</span>
             </label>
             <input
               value={street}
               onChange={(e) => setStreet(e.target.value)}
               className="w-full rounded-lg border-2 border-[#d4af37]/30 px-4 py-3 outline-none focus:border-[#d4af37] transition-colors"
-              placeholder="House number and street name"
+              placeholder={t('streetPlaceholder')}
               required
             />
           </div>
@@ -168,19 +170,19 @@ export default function CheckoutForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-semibold text-[#001f3f] mb-2">
-                City <span className="text-[#d4af37]">*</span>
+                {t('city')} <span className="text-[#d4af37]">*</span>
               </label>
               <input
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 className="w-full rounded-lg border-2 border-[#d4af37]/30 px-4 py-3 outline-none focus:border-[#d4af37] transition-colors"
-                placeholder="City name"
+                placeholder={t('cityPlaceholder')}
                 required
               />
             </div>
             <div>
               <label className="block text-sm font-semibold text-[#001f3f] mb-2">
-                Governorate <span className="text-[#d4af37]">*</span>
+                {t('governorate')} <span className="text-[#d4af37]">*</span>
               </label>
               <select
                 value={governorate}
@@ -188,7 +190,7 @@ export default function CheckoutForm() {
                 className="w-full rounded-lg border-2 border-[#d4af37]/30 px-4 py-3 outline-none focus:border-[#d4af37] transition-colors bg-white appearance-none"
                 required
               >
-                <option value="" disabled>Select governorate</option>
+                <option value="" disabled>{t('selectGovernorate')}</option>
                 {TUNISIAN_GOVERNORATES.map(gov => (
                   <option key={gov} value={gov}>{gov}</option>
                 ))}
@@ -216,12 +218,12 @@ export default function CheckoutForm() {
             {isPending ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Processing...
+                {t('processing')}
               </>
             ) : (
               <>
                 <CheckCircle className="w-5 h-5" />
-                Place Order • {total.toFixed(2)} TND
+                {t('placeOrder')} • {total.toFixed(2)} TND
               </>
             )}
           </motion.button>
@@ -230,7 +232,7 @@ export default function CheckoutForm() {
 
       {/* Order Summary */}
       <motion.div
-        initial={{ opacity: 0, x: 20 }}
+        initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
         animate={{ opacity: 1, x: 0 }}
         className="lg:col-span-2 rounded-2xl border-2 border-[#d4af37]/20 p-6 bg-gradient-to-br from-[#001f3f] to-[#003366] text-white h-fit shadow-xl"
       >
@@ -238,16 +240,16 @@ export default function CheckoutForm() {
           className="text-2xl font-bold mb-6"
           style={{ fontFamily: 'Playfair Display, serif' }}
         >
-          Order Summary
+          {t('orderSummary')}
         </h3>
         <div className="space-y-4">
           {items.map((item) => (
             <div key={item.lineId} className="flex justify-between gap-3 pb-4 border-b border-white/20">
-              <div className="min-w-0">
+              <div className="min-w-0 text-start">
                 <p className="font-semibold truncate">{item.name} × {item.quantity}</p>
                 {(item.size || item.color) && (
                   <p className="text-sm text-white/70 mt-1">
-                    {item.size ? `Size ${item.size}` : ''}
+                    {item.size ? `${t('sizes')} ${item.size}` : ''}
                     {item.size && item.color ? ' • ' : ''}
                     {item.color ?? ''}
                   </p>
@@ -259,7 +261,7 @@ export default function CheckoutForm() {
             </div>
           ))}
           <div className="pt-4 mt-4 border-t-2 border-[#d4af37]/30 flex justify-between items-center">
-            <span className="text-xl font-semibold">Total</span>
+            <span className="text-xl font-semibold">{t('total')}</span>
             <span className="text-3xl font-bold text-[#d4af37]">{total.toFixed(2)} TND</span>
           </div>
         </div>

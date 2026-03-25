@@ -165,3 +165,39 @@ h6 {
   opacity: 0.3;
   animation: float-particle var(--duration, 10s) infinite ease-in-out;
 }
+
+/* =============================================
+   RTL / LTR Global Direction Support
+   ============================================= */
+
+/* Smooth direction change */
+html {
+  transition: none;
+}
+
+/* Arabic font stack for RTL pages */
+[dir="rtl"] body {
+  font-family: 'Segoe UI', 'Tahoma', 'Arial', 'Noto Sans Arabic', system-ui, sans-serif;
+}
+
+/* Flip Tailwind's space-x utilities in RTL */
+[dir="rtl"] .space-x-1 > * + * { margin-inline-start: 0.25rem; margin-inline-end: 0; margin-left: 0; }
+[dir="rtl"] .space-x-2 > * + * { margin-inline-start: 0.5rem;  margin-inline-end: 0; margin-left: 0; }
+[dir="rtl"] .space-x-3 > * + * { margin-inline-start: 0.75rem; margin-inline-end: 0; margin-left: 0; }
+[dir="rtl"] .space-x-4 > * + * { margin-inline-start: 1rem;    margin-inline-end: 0; margin-left: 0; }
+[dir="rtl"] .space-x-8 > * + * { margin-inline-start: 2rem;    margin-inline-end: 0; margin-left: 0; }
+[dir="rtl"] .space-x-10 > * + *{ margin-inline-start: 2.5rem;  margin-inline-end: 0; margin-left: 0; }
+
+/* RTL-safe text alignment helper */
+[dir="rtl"] .text-left  { text-align: right; }
+[dir="rtl"] .text-right { text-align: left; }
+
+/* Flip directional icons in RTL using .icon-flip utility */
+[dir="rtl"] .icon-flip {
+  transform: scaleX(-1);
+}
+
+/* Navbar & Marquee RTL override */
+[dir="rtl"] .lg\:text-left { text-align: right; }
+[dir="rtl"] .lg\:justify-start { justify-content: flex-end; }
+[dir="rtl"] .lg\:mx-0 { margin-inline-start: 0; margin-inline-end: auto; }

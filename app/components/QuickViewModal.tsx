@@ -1,11 +1,11 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
-import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
 import { Product } from '@/lib/types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface QuickViewModalProps {
   product: Product;
@@ -15,6 +15,7 @@ interface QuickViewModalProps {
 export default function QuickViewModal({ product, onClose }: QuickViewModalProps) {
   const addItem = useCartStore((state) => state.addItem);
   const openCart = useCartStore((state) => state.openCart);
+  const { t } = useLanguage();
 
   const handleAddToCart = () => {
     addItem({
@@ -40,8 +41,16 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+          className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative"
         >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 end-4 p-2 text-gray-500 hover:text-[#001f3f] hover:bg-gray-100 rounded-full transition-colors z-10"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
           <div className="grid md:grid-cols-2 gap-8 p-8">
             {/* Image */}
             <div className="relative h-96 rounded-lg overflow-hidden bg-gradient-to-br from-[#001f3f]/5 to-[#d4af37]/5">
@@ -53,7 +62,7 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-gray-400">No image</span>
+                  <span className="text-gray-400">{t('noImage')}</span>
                 </div>
               )}
             </div>
@@ -61,13 +70,6 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
             {/* Info */}
             <div className="space-y-6">
               <div>
-                <button
-                  onClick={onClose}
-                  className="absolute top-4 right-4 p-2 text-gray-500 hover:text-[#001f3f] hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-
                 <h2
                   className="text-3xl font-bold text-[#001f3f] mb-4"
                   style={{ fontFamily: 'Playfair Display, serif' }}
@@ -93,9 +95,9 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                 )}
 
                 {product.sizes && product.sizes.length > 0 && (
-                  <div>
+                  <div className="mt-4">
                     <p className="text-sm font-semibold text-[#001f3f] mb-2">
-                      Available Sizes:
+                      {t('availableSizes')}:
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {product.sizes.map((size) => (
@@ -119,14 +121,14 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                   className="flex-1 py-4 px-6 bg-gradient-to-r from-[#001f3f] to-[#001f3f] hover:from-[#d4af37] hover:to-[#d4af37] text-white hover:text-[#001f3f] rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg"
                 >
                   <ShoppingCart className="w-5 h-5" />
-                  Add to Cart
+                  {t('addToCart')}
                 </motion.button>
                 <Link
                   href={`/products/${product.id}`}
                   onClick={onClose}
                   className="flex-1 py-4 px-6 border-2 border-[#001f3f] text-[#001f3f] hover:bg-[#001f3f] hover:text-white rounded-lg font-semibold transition-all duration-300 text-center"
                 >
-                  View Details
+                  {t('viewDetails')}
                 </Link>
               </div>
             </div>

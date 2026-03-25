@@ -9,8 +9,10 @@ import { useCartStore } from '../../store/cartStore';
 import Navbar from '../../components/Navbar';
 import CartSidebar from '../../components/CartSidebar';
 import { ArrowLeft, ShoppingCart, Crown, TrendingUp } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function ProductDetailPage() {
+  const { t, dir } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const productId = params.id as string;
@@ -87,12 +89,12 @@ export default function ProductDetailPage() {
         <Navbar />
         <CartSidebar />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <h1 className="text-3xl font-bold text-[#001f3f] mb-4">Product not found</h1>
+          <h1 className="text-3xl font-bold text-[#001f3f] mb-4">{t('productNotFound')}</h1>
           <button
             onClick={() => router.push('/')}
             className="text-[#001f3f] hover:text-[#d4af37] transition-colors font-semibold"
           >
-            Return to home
+            {t('returnHome')}
           </button>
         </div>
       </div>
@@ -109,19 +111,19 @@ export default function ProductDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back Button */}
         <motion.button
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
           animate={{ opacity: 1, x: 0 }}
           onClick={() => router.back()}
           className="flex items-center gap-2 text-[#001f3f] hover:text-[#d4af37] transition-colors mb-8 font-semibold group"
         >
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span>Back to Collection</span>
+          <ArrowLeft className={`w-5 h-5 ${dir === 'rtl' ? 'rotate-180 group-hover:translate-x-1' : 'group-hover:-translate-x-1'} transition-transform`} />
+          <span>{t('backToCollection')}</span>
         </motion.button>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           {/* Product Images with Parallax */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: dir === 'rtl' ? 50 : -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
             className="space-y-4"
@@ -142,14 +144,14 @@ export default function ProductDetailPage() {
               )}
 
               {/* Badges */}
-              <div className="absolute top-6 left-6 flex flex-col gap-2">
+              <div className={`absolute top-6 ${dir === 'rtl' ? 'right-6' : 'left-6'} flex flex-col gap-2`}>
                 {isLimitedStock && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className="px-4 py-2 bg-red-500 text-white text-sm font-bold rounded-full shadow-lg animate-pulse"
                   >
-                    Limited Stock
+                    {t('limitedStock')}
                   </motion.span>
                 )}
                 {product.category && (
@@ -160,10 +162,10 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Viewers Badge */}
-              <div className="absolute top-6 right-6 flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg">
+              <div className={`absolute top-6 ${dir === 'rtl' ? 'left-6' : 'right-6'} flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg`}>
                 <TrendingUp className="w-4 h-4 text-[#d4af37]" />
                 <span className="text-sm font-semibold text-[#001f3f]">
-                  {viewers} viewing
+                  {viewers} {t('viewing')}
                 </span>
               </div>
             </div>
@@ -171,10 +173,10 @@ export default function ProductDetailPage() {
 
           {/* Product Info */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: dir === 'rtl' ? -50 : 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-8"
+            className="space-y-8 text-start"
           >
             <div>
               <h1
@@ -199,7 +201,7 @@ export default function ProductDetailPage() {
             {product.color && (
               <div>
                 <h3 className="text-lg font-semibold text-[#001f3f] mb-3 uppercase tracking-wider">
-                  Color
+                  {t('color')}
                 </h3>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -219,7 +221,7 @@ export default function ProductDetailPage() {
             {product.sizes && product.sizes.length > 0 && (
               <div>
                 <h3 className="text-lg font-semibold text-[#001f3f] mb-4 uppercase tracking-wider">
-                  Size <span className="text-[#d4af37]">*</span>
+                  {t('sizes')} <span className="text-[#d4af37]">*</span>
                 </h3>
                 <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
                   {product.sizes.map((size) => (
@@ -254,10 +256,10 @@ export default function ProductDetailPage() {
               {selectedSize ? (
                 <>
                   <ShoppingCart className="w-6 h-6" />
-                  Add to Cart
+                  {t('addToCart')}
                 </>
               ) : (
-                'Please select a size'
+                t('selectSize')
               )}
             </motion.button>
 
@@ -268,7 +270,7 @@ export default function ProductDetailPage() {
                   className="text-2xl font-bold text-[#001f3f] mb-4"
                   style={{ fontFamily: 'Playfair Display, serif' }}
                 >
-                  Product Description
+                  {t('productDescriptionTitle')}
                 </h3>
                 <p className="text-gray-700 leading-relaxed text-lg">
                   {product.description}
@@ -282,20 +284,20 @@ export default function ProductDetailPage() {
                 className="text-2xl font-bold text-[#001f3f] mb-4"
                 style={{ fontFamily: 'Playfair Display, serif' }}
               >
-                Shipping Information
+                {t('shippingInformation')}
               </h3>
               <div className="space-y-3 text-gray-700">
                 <p>
-                  <span className="font-bold text-[#001f3f]">Free Shipping:</span> Orders over 100 TND qualify for free standard shipping within Tunisia.
+                  <span className="font-bold text-[#001f3f]">{t('freeShipping')}:</span> {t('freeShippingDesc')}
                 </p>
                 <p>
-                  <span className="font-bold text-[#001f3f]">Standard Shipping:</span> 3-5 business days - 15 TND
+                  <span className="font-bold text-[#001f3f]">{t('standardShipping')}:</span> {t('standardShippingDesc')}
                 </p>
                 <p>
-                  <span className="font-bold text-[#001f3f]">Express Shipping:</span> 1-2 business days - 25 TND
+                  <span className="font-bold text-[#001f3f]">{t('expressShipping')}:</span> {t('expressShippingDesc')}
                 </p>
                 <p>
-                  <span className="font-bold text-[#001f3f]">Returns:</span> 30-day return policy. Items must be unworn and in original packaging.
+                  <span className="font-bold text-[#001f3f]">{t('returns')}:</span> {t('returnsDesc')}
                 </p>
               </div>
             </div>

@@ -1,9 +1,11 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Marquee() {
-    const text = "تخفيضات خيالية لمدة محدودة  |  Discount up to 70% off  |  ";
+    const { t } = useLanguage();
+    const text = t('marqueeText');
 
     return (
         <div className="relative w-full overflow-hidden bg-[#D4AF37] py-2">

@@ -8,6 +8,7 @@ import { Eye, ShoppingCart, TrendingUp } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
 import { Product } from '@/lib/types';
 import QuickViewModal from './QuickViewModal';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ProductCardProps {
   product: Product;
@@ -17,9 +18,10 @@ interface ProductCardProps {
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showQuickView, setShowQuickView] = useState(false);
-  const [viewers, setViewers] = useState(Math.floor(Math.random() * 15) + 1);
+  const [viewers] = useState(Math.floor(Math.random() * 15) + 1);
   const addItem = useCartStore((state) => state.addItem);
   const openCart = useCartStore((state) => state.openCart);
+  const { t } = useLanguage();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -32,7 +34,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
     openCart();
   };
 
-  const isLimitedStock = Math.random() > 0.7; // 30% chance
+  const isLimitedStock = Math.random() > 0.7;
 
   return (
     <>
@@ -48,30 +50,28 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          {/* Image Container with Hover Zoom */}
+          {/* Image Container */}
           <div className="relative w-full h-80 bg-gradient-to-br from-[#0a0a0a]/5 to-[#d4af37]/5 overflow-hidden">
             {product.image_url ? (
               <motion.img
                 src={product.image_url}
                 alt={product.title}
                 className="w-full h-full object-cover"
-                animate={{
-                  scale: isHovered ? 1.1 : 1,
-                }}
+                animate={{ scale: isHovered ? 1.1 : 1 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 loading="lazy"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                <span className="text-gray-400 text-sm">No image</span>
+                <span className="text-gray-400 text-sm">{t('noImage')}</span>
               </div>
             )}
 
             {/* Badges */}
-            <div className="absolute top-4 left-4 flex flex-col gap-2">
+            <div className="absolute top-4 start-4 flex flex-col gap-2">
               {isLimitedStock && (
                 <span className="px-3 py-1 bg-red-500 text-white text-xs font-bold rounded-full shadow-lg animate-pulse">
-                  Limited Stock
+                  {t('limitedStock')}
                 </span>
               )}
               {product.category && (
@@ -82,20 +82,17 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             </div>
 
             {/* Viewers Badge */}
-            <div className="absolute top-4 right-4 flex items-center gap-1 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg">
+            <div className="absolute top-4 end-4 flex items-center gap-1 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg">
               <TrendingUp className="w-3 h-3 text-[#d4af37]" />
               <span className="text-xs font-semibold text-[#0a0a0a]">
-                {viewers} viewing
+                {viewers} {t('viewing')}
               </span>
             </div>
 
-            {/* Quick View Button */}
+            {/* Quick View Overlay */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{
-                opacity: isHovered ? 1 : 0,
-                y: isHovered ? 0 : 20,
-              }}
+              animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 20 }}
               className="absolute inset-0 bg-[#0a0a0a]/80 backdrop-blur-sm flex items-center justify-center gap-4"
             >
               <motion.button
@@ -108,7 +105,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 className="px-6 py-3 bg-[#d4af37] text-[#0a0a0a] rounded-lg font-semibold flex items-center gap-2 hover:bg-[#d4af37]/90 transition-colors shadow-lg"
               >
                 <Eye className="w-5 h-5" />
-                Quick View
+                {t('quickView')}
               </motion.button>
             </motion.div>
           </div>
@@ -123,7 +120,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 {product.title}
               </h3>
               {product.color && (
-                <p className="text-sm text-gray-600">Color: {product.color}</p>
+                <p className="text-sm text-gray-600">{t('color')}: {product.color}</p>
               )}
             </div>
 
@@ -134,14 +131,14 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 </p>
                 {product.sizes && product.sizes.length > 0 && (
                   <p className="text-xs text-gray-500">
-                    Sizes: {product.sizes.slice(0, 3).join(', ')}
+                    {t('sizes')}: {product.sizes.slice(0, 3).join(', ')}
                     {product.sizes.length > 3 && '...'}
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Add to Cart Button with Magnet Effect */}
+            {/* Add to Cart Button */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -149,13 +146,12 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               className="w-full py-3 px-6 bg-gradient-to-r from-[#0a0a0a] to-[#0a0a0a] hover:from-[#d4af37] hover:to-[#d4af37] text-white hover:text-[#0a0a0a] rounded-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
             >
               <ShoppingCart className="w-5 h-5" />
-              Add to Cart
+              {t('addToCart')}
             </motion.button>
           </div>
         </Link>
       </motion.div>
 
-      {/* Quick View Modal */}
       {showQuickView && (
         <QuickViewModal
           product={product}

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { X, Plus, Minus, Trash2, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '../store/cartStore';
+import { useLanguage } from '../context/LanguageContext';
 import Link from 'next/link';
 
 export default function CartSidebar() {
@@ -16,6 +17,7 @@ export default function CartSidebar() {
     removeItem,
     getTotalPrice,
   } = useCartStore();
+  const { t, isRTL } = useLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -36,13 +38,13 @@ export default function CartSidebar() {
             onClick={closeCart}
           />
 
-          {/* Sidebar */}
+          {/* Sidebar — slides from right in LTR, from left in RTL */}
           <motion.div
-            initial={{ x: '100%' }}
+            initial={{ x: isRTL ? '-100%' : '100%' }}
             animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            exit={{ x: isRTL ? '-100%' : '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-white shadow-2xl z-50"
+            className={`fixed top-0 h-full w-full sm:w-[450px] bg-white shadow-2xl z-50 ${isRTL ? 'left-0' : 'right-0'}`}
           >
             <div className="flex flex-col h-full">
               {/* Header */}
@@ -53,7 +55,7 @@ export default function CartSidebar() {
                     className="text-2xl font-bold text-white"
                     style={{ fontFamily: 'Playfair Display, serif' }}
                   >
-                    Shopping Cart
+                    {t('shoppingCart')}
                   </h2>
                 </div>
                 <button
@@ -70,15 +72,15 @@ export default function CartSidebar() {
                 {items.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-center">
                     <ShoppingBag className="w-16 h-16 text-gray-300 mb-4" />
-                    <p className="text-gray-500 text-lg mb-2 font-semibold">Your cart is empty</p>
-                    <p className="text-gray-400 text-sm">Add some premium items to get started</p>
+                    <p className="text-gray-500 text-lg mb-2 font-semibold">{t('cartEmpty')}</p>
+                    <p className="text-gray-400 text-sm">{t('cartEmptySub')}</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {items.map((item, index) => (
                       <motion.div
                         key={item.lineId}
-                        initial={{ opacity: 0, x: 20 }}
+                        initial={{ opacity: 0, x: isRTL ? -20 : 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
                         className="flex gap-4 p-4 bg-white border-2 border-[#d4af37]/20 rounded-xl hover:border-[#d4af37] transition-all shadow-lg"
@@ -94,7 +96,7 @@ export default function CartSidebar() {
                           <p className="text-[#d4af37] font-semibold text-sm mt-1">{item.price} TND</p>
                           {(item.size || item.color) && (
                             <p className="text-gray-500 text-xs mt-1">
-                              {item.size ? `Size ${item.size}` : ''}
+                              {item.size ? `${t('sizes')} ${item.size}` : ''}
                               {item.size && item.color ? ' • ' : ''}
                               {item.color ? item.color : ''}
                             </p>
@@ -127,7 +129,7 @@ export default function CartSidebar() {
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
                               onClick={() => removeItem(item.lineId)}
-                              className="ml-auto p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors rounded-lg"
+                              className="ms-auto p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors rounded-lg"
                               aria-label="Remove item"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -149,7 +151,7 @@ export default function CartSidebar() {
               {items.length > 0 && (
                 <div className="border-t-2 border-[#d4af37]/30 p-6 bg-gradient-to-r from-[#001f3f] to-[#001f3f] space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold text-white">Total:</span>
+                    <span className="text-lg font-semibold text-white">{t('total')}:</span>
                     <span className="text-3xl font-bold text-[#d4af37]">
                       {getTotalPrice().toFixed(2)} TND
                     </span>
@@ -159,7 +161,7 @@ export default function CartSidebar() {
                     onClick={closeCart}
                     className="block w-full py-4 px-6 text-center bg-gradient-to-r from-[#d4af37] to-[#b8941e] text-[#001f3f] font-bold rounded-lg hover:shadow-xl hover:shadow-[#d4af37]/50 transition-all duration-300"
                   >
-                    Proceed to Checkout
+                    {t('proceedCheckout')}
                   </Link>
                 </div>
               )}
