@@ -1,17 +1,34 @@
+export interface ProductOption {
+    name: string;
+    values: string[];
+}
+
+export interface ProductVariant {
+    id: string;
+    options: Record<string, string>;
+    price: number;
+    stock: number;
+    image_url: string | null;
+}
+
 export interface Product {
     id: string;
     title: string;
-    price: number;
     description: string | null;
-    image_url: string | null;
-    sizes: number[] | null;
-    color: string | null;
+    price: number; // Base price
+    image_url: string | null; // Thumbnail/Cover image
+    images: string[] | null; // Multi-image gallery
+    options: ProductOption[] | null; // Dynamic attributes like Color, Size
+    variants: ProductVariant[] | null; // Specific combinations
     category?: string | null;
+    stock: number;
     cost_price?: number;
     compare_at_price?: number;
     image_type?: 'url' | 'upload';
     created_at?: string;
+    updated_at?: string;
 }
+
 
 export type OrderStatus = 'pending' | 'shipped' | 'delivered' | 'cancelled' | 'paid';
 export type PaymentStatus = 'paid' | 'unpaid';
@@ -25,7 +42,7 @@ export interface Order {
     status: OrderStatus;
     payment_status: PaymentStatus;
     created_at: string;
-    items?: any[]; // For future expansion
+    items?: any[];
 }
 
 export interface Customer {
@@ -35,7 +52,7 @@ export interface Customer {
     totalOrders: number;
     totalSpent: number;
     lastOrder: string;
-    isPaid: boolean; // Derived from their order history
+    isPaid: boolean;
 }
 
 export interface ApiResponse<T = any> {
@@ -55,12 +72,13 @@ export interface DashboardStats {
 
 export interface CreateProductInput {
     title: string;
-    price: number;
     description: string;
-    category: string;
-    sizes: number[];
+    price: number;
     image_url: string;
-    color?: string;
+    images: string[];
+    options: ProductOption[];
+    variants: ProductVariant[];
+    category: string;
     cost_price?: number;
     compare_at_price?: number;
     image_type?: 'url' | 'upload';

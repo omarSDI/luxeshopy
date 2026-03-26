@@ -1,17 +1,20 @@
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
+import { Suspense } from 'react';
 import { LanguageProvider } from "./context/LanguageContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import WhatsAppButton from "./components/WhatsAppButton";
+import VisitorTracker from "./components/VisitorTracker";
+import FBPixelScript from "./components/FBPixelScript";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "LuxeShopy | Luxury Footwear & Premium Sneakers",
-  description: "Experience excellence with LuxeShopy. Discover our curated collection of luxury footwear, designer sneakers, and timeless classics. Premium quality, exceptional style.",
-  keywords: ["shoes", "luxury", "footwear", "luxeshopy", "fashion", "sneakers"],
+  title: "LuxeShopy | Shop Premium Watches & Luxury Gear",
+  description: "Experience excellence with LuxeShopy. Discover our curated collection of luxury timepieces and premium tech. Quality gear for the modern visionary.",
+  keywords: ["watches", "luxury", "tech", "luxeshopy", "fashion", "premium"],
   openGraph: {
-    title: "LuxeShopy - Luxury Footwear Collection",
-    description: "Premium quality footwear designed for style and comfort.",
+    title: "LuxeShopy - Premium Collection",
+    description: "Quality gear for the modern visionary.",
     url: "https://luxeshopy.tn",
     siteName: "LuxeShopy",
     images: [
@@ -42,6 +45,10 @@ export default function RootLayout({
       <body className="antialiased">
         <ThemeProvider>
           <LanguageProvider>
+            <Suspense fallback={null}>
+              <FBPixelScript />
+            </Suspense>
+            <VisitorTracker />
             {children}
             <Toaster
               position="top-right"

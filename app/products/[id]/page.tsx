@@ -1,307 +1,271 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getProductById } from '@/app/actions/products';
 import { Product } from '@/lib/types';
-import { useCartStore } from '../../store/cartStore';
-import Navbar from '../../components/Navbar';
-import CartSidebar from '../../components/CartSidebar';
-import { ArrowLeft, ShoppingCart, Crown, TrendingUp } from 'lucide-react';
-import { useLanguage } from '../../context/LanguageContext';
+import { useLanguage } from '@/app/context/LanguageContext';
+import { 
+  ArrowLeft, 
+  ChevronLeft, 
+  ChevronRight, 
+  TrendingUp, 
+  ShieldCheck, 
+  Truck,
+  Zap,
+  Star
+} from 'lucide-react';
+import Link from 'next/link';
+import Navbar from '@/app/components/Navbar';
+import * as fbpixel from '@/lib/fpixel';
+import QuickOrderForm from '@/app/components/QuickOrderForm';
+import { InventoryCounter, LiveSalesPopup, StickyBuyBar } from '@/app/components/UrgencyComponents';
 
 export default function ProductDetailPage() {
   const { t, dir } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const productId = params.id as string;
-  const [mounted, setMounted] = useState(false);
-
+  
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedSize, setSelectedSize] = useState<number | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [viewers, setViewers] = useState(Math.floor(Math.random() * 15) + 1);
-
-  const addItem = useCartStore((state) => state.addItem);
-  const openCart = useCartStore((state) => state.openCart);
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [viewers, setViewers] = useState(0);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    async function fetchProduct() {
-      try {
-        const data = await getProductById(productId);
+    async function loadProduct() {
+      const data = await getProductById(productId);
+      if (data) {
         setProduct(data);
-      } catch (error) {
-        console.error('Failed to load product:', error);
-      } finally {
-        setLoading(false);
+        // Initialize options
+        const initialOptions: Record<string, string> = {};
+        if (data.options) {
+          data.options.forEach((opt: any) => {
+            if (opt.values && opt.values.length > 0) {
+                initialOptions[opt.name] = opt.values[0];
+            }
+          });
+        }
+        setSelectedOptions(initialOptions);
+
+        // Pixel: ViewContent
+        fbpixel.event('ViewContent', {
+            content_name: data.title,
+            content_ids: [data.id],
+            content_type: 'product',
+            value: data.price,
+            currency: 'TND'
+        });
       }
+      setLoading(false);
     }
-    if (productId) {
-      fetchProduct();
-    }
+    loadProduct();
+    setViewers(Math.floor(Math.random() * 20) + 15);
   }, [productId]);
 
-  const handleAddToCart = () => {
-    if (!selectedSize || !product) return;
-
-    addItem(
-      {
-        id: product.id,
-        name: product.title,
-        price: product.price,
-      },
-      {
-        size: selectedSize,
-        color: selectedColor ?? product.color ?? undefined,
-      }
+  const currentVariant = useMemo(() => {
+    if (!product?.variants) return null;
+    return product.variants.find(v => 
+      Object.entries(selectedOptions).every(([k, val]) => v.options[k] === val)
     );
-    openCart();
+  }, [product, selectedOptions]);
+
+  // Update gallery when variant changes
+  useEffect(() => {
+    if (currentVariant?.image_url && (product?.images || product?.image_url)) {
+      const allImgs = (product.images && product.images.length > 0 ? product.images : [product.image_url]).filter(Boolean) as string[];
+      const idx = allImgs.findIndex(img => img === currentVariant.image_url);
+      if (idx !== -1) setCurrentImageIndex(idx);
+    }
+  }, [currentVariant, product]);
+
+  const scrollToCheckout = () => {
+    const el = document.getElementById('quick-order');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
-  if (!mounted || loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-[#d4af37]/5">
-        <Navbar />
-        <CartSidebar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="skeleton h-[600px] rounded-2xl"></div>
-            <div className="space-y-6">
-              <div className="skeleton h-12 w-3/4 rounded"></div>
-              <div className="skeleton h-8 w-1/2 rounded"></div>
-              <div className="skeleton h-32 w-full rounded"></div>
+  if (loading) return (
+    <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="w-12 h-12 border-4 border-[#00FF41] border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+  
+  if (!product) return (
+    <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-4">
+        <h1 className="text-4xl font-black italic uppercase mb-8">PRODUCT NOT FOUND</h1>
+        <Link href="/shop" className="px-8 py-4 bg-[#00FF41] text-black font-black rounded-2xl uppercase tracking-widest">BACK TO SHOP</Link>
+    </div>
+  );
+
+  const images = (product.images && product.images.length > 0 ? product.images : [product.image_url]).filter(Boolean) as string[];
+  const price = currentVariant?.price || product.price;
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-[#00FF41] selection:text-black pb-20">
+      <Navbar />
+      <LiveSalesPopup />
+      <StickyBuyBar price={price} onBuy={scrollToCheckout} />
+
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+        <Link 
+          href="/shop" 
+          className="inline-flex items-center gap-2 text-white/40 hover:text-[#00FF41] transition-colors mb-12 group uppercase font-black tracking-widest text-[10px]"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          RETOUR À LA BOUTIQUE
+        </Link>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-24 mb-20">
+          {/* Visual Gallery Section */}
+          <div className="space-y-6">
+            <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-white/5 border border-white/10 group/gallery shadow-2xl">
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={currentImageIndex}
+                  src={images[currentImageIndex] || ''}
+                  alt={product.title}
+                  initial={{ opacity: 0, scale: 1.1 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-full h-full object-cover"
+                />
+              </AnimatePresence>
+
+              {/* Video Overlay Badge (Simulated) */}
+              <div className="absolute top-6 left-6 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/20 flex items-center gap-2">
+                 <div className="w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
+                 <span className="text-[10px] font-black italic uppercase">HD VIDEO SHOWCASE</span>
+              </div>
+
+              {images.length > 1 && (
+                <>
+                  <button 
+                    onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
+                    className="absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-[#00FF41] hover:text-black backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 transition-all opacity-0 group-hover/gallery:opacity-100"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button 
+                    onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-[#00FF41] hover:text-black backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 transition-all opacity-0 group-hover/gallery:opacity-100"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+              {images.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentImageIndex(idx)}
+                  className={`relative flex-shrink-0 w-24 aspect-square rounded-2xl overflow-hidden border-2 transition-all ${
+                    currentImageIndex === idx ? 'border-[#00FF41] scale-105 shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'border-white/10 grayscale opacity-40 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img || ''} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Checkout & Decision Section */}
+          <div className="flex flex-col">
+            <div className="space-y-6 mb-10">
+              <div className="flex items-center gap-3">
+                <span className="px-5 py-1.5 bg-[#00FF41]/10 text-[#00FF41] rounded-full text-[10px] font-black uppercase tracking-widest border border-[#00FF41]/20">
+                  Édition Limitée
+                </span>
+                <span className="flex items-center gap-1.5 text-white/40 text-[10px] font-black uppercase tracking-widest">
+                  <TrendingUp className="w-3 h-3 text-[#00FF41]" />
+                  {viewers} Visionnent
+                </span>
+              </div>
+
+              <h1 className="text-5xl lg:text-7xl font-black italic uppercase tracking-tighter leading-none">
+                {product.title}
+              </h1>
+
+              <div className="flex items-baseline gap-6">
+                <p className="text-5xl font-black text-[#00FF41] tracking-tighter italic">
+                  {price.toFixed(2)} TND
+                </p>
+                {product.compare_at_price && (
+                  <p className="text-2xl text-white/30 line-through font-bold">
+                    {product.compare_at_price.toFixed(2)} TND
+                  </p>
+                )}
+              </div>
+
+              <InventoryCounter 
+                stock={currentVariant?.stock ?? product.stock} 
+                variantName={selectedOptions['Color'] || selectedOptions['Model']} 
+              />
+            </div>
+
+            {/* Dynamic Option Selectors */}
+            {product.options && (product.options as any[]).map((option) => (
+              <div key={option.name} className="mb-10">
+                <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-4">
+                  SÉLECTIONNEZ {option.name}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {option.values.map((val: string) => {
+                    const isActive = selectedOptions[option.name] === val;
+                    return (
+                      <button
+                        key={val}
+                        onClick={() => setSelectedOptions(prev => ({ ...prev, [option.name]: val }))}
+                        className={`px-8 py-4 rounded-2xl text-xs font-black uppercase transition-all duration-300 border-2 ${
+                          isActive 
+                          ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]' 
+                          : 'bg-transparent text-white border-white/10 hover:border-white/40'
+                        }`}
+                      >
+                        {val}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            <div id="quick-order" className="mt-4 animate-fade-in">
+              <QuickOrderForm product={product} variant={currentVariant} />
+            </div>
+
+            {/* High-Tech Trust Banner */}
+            <div className="mt-12 p-8 rounded-[2rem] bg-white/5 border border-white/10 grid grid-cols-2 gap-8">
+               <div className="space-y-2">
+                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4">
+                    <ShieldCheck className="w-5 h-5 text-[#00FF41]" />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#00FF41]">AUTHENTICITÉ</p>
+                  <p className="text-[10px] text-white/40 leading-relaxed">Produits 100% originaux dans leur emballage d'origine.</p>
+               </div>
+               <div className="space-y-2">
+                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4">
+                    <Truck className="w-5 h-5 text-[#00FF41]" />
+                  </div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#00FF41]">EXPÉDITION</p>
+                  <p className="text-[10px] text-white/40 leading-relaxed">Livraison express dans toute la Tunisie sous 24/48h.</p>
+               </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
 
-  if (!product) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-[#d4af37]/5">
-        <Navbar />
-        <CartSidebar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <h1 className="text-3xl font-bold text-[#001f3f] mb-4">{t('productNotFound')}</h1>
-          <button
-            onClick={() => router.push('/')}
-            className="text-[#001f3f] hover:text-[#d4af37] transition-colors font-semibold"
-          >
-            {t('returnHome')}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const isLimitedStock = Math.random() > 0.7;
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-[#d4af37]/5">
-      <Navbar />
-      <CartSidebar />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Back Button */}
-        <motion.button
-          initial={{ opacity: 0, x: dir === 'rtl' ? 20 : -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-[#001f3f] hover:text-[#d4af37] transition-colors mb-8 font-semibold group"
-        >
-          <ArrowLeft className={`w-5 h-5 ${dir === 'rtl' ? 'rotate-180 group-hover:translate-x-1' : 'group-hover:-translate-x-1'} transition-transform`} />
-          <span>{t('backToCollection')}</span>
-        </motion.button>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          {/* Product Images with Parallax */}
-          <motion.div
-            initial={{ opacity: 0, x: dir === 'rtl' ? 50 : -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-4"
-          >
-            <div className="relative w-full aspect-square bg-gradient-to-br from-[#001f3f]/10 to-[#d4af37]/10 rounded-3xl overflow-hidden border-2 border-[#d4af37]/20 shadow-2xl">
-              {product.image_url ? (
-                <motion.img
-                  src={product.image_url}
-                  alt={product.title}
-                  className="h-full w-full object-cover"
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.4 }}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Crown className="w-32 h-32 text-[#d4af37]/30" />
-                </div>
-              )}
-
-              {/* Badges */}
-              <div className={`absolute top-6 ${dir === 'rtl' ? 'right-6' : 'left-6'} flex flex-col gap-2`}>
-                {isLimitedStock && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="px-4 py-2 bg-red-500 text-white text-sm font-bold rounded-full shadow-lg animate-pulse"
-                  >
-                    {t('limitedStock')}
-                  </motion.span>
-                )}
-                {product.category && (
-                  <span className="px-4 py-2 bg-[#001f3f] text-[#d4af37] text-sm font-semibold rounded-full capitalize shadow-lg">
-                    {product.category}
-                  </span>
-                )}
-              </div>
-
-              {/* Viewers Badge */}
-              <div className={`absolute top-6 ${dir === 'rtl' ? 'left-6' : 'right-6'} flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg`}>
-                <TrendingUp className="w-4 h-4 text-[#d4af37]" />
-                <span className="text-sm font-semibold text-[#001f3f]">
-                  {viewers} {t('viewing')}
-                </span>
-              </div>
+        {/* Extended Description / Specs */}
+        <div className="border-t border-white/10 pt-20">
+          <div className="max-w-3xl">
+            <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-8">SPÉCIFICATIONS TECHNIQUES</h2>
+            <div className="prose prose-invert max-w-none text-white/60 font-bold leading-relaxed text-sm lg:text-base">
+              {product.description || "Une ingénierie de précision rencontre une esthétique futuriste. Ce produit est conçu pour ceux qui exigent l'excellence à chaque instant."}
             </div>
-          </motion.div>
-
-          {/* Product Info */}
-          <motion.div
-            initial={{ opacity: 0, x: dir === 'rtl' ? -50 : 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="space-y-8 text-start"
-          >
-            <div>
-              <h1
-                className="text-4xl md:text-5xl font-bold text-[#001f3f] mb-4"
-                style={{ fontFamily: 'Playfair Display, serif' }}
-              >
-                {product.title}
-              </h1>
-              <div className="flex items-baseline gap-4">
-                <p className="text-4xl font-bold text-[#d4af37]">
-                  {product.price.toFixed(2)} TND
-                </p>
-                {product.category && (
-                  <span className="px-3 py-1 bg-[#001f3f] text-[#d4af37] text-sm font-semibold rounded-full capitalize">
-                    {product.category}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Color Selection */}
-            {product.color && (
-              <div>
-                <h3 className="text-lg font-semibold text-[#001f3f] mb-3 uppercase tracking-wider">
-                  {t('color')}
-                </h3>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setSelectedColor(product.color!)}
-                  className={`px-8 py-3 border-2 rounded-lg font-semibold transition-all duration-300 ${selectedColor === product.color
-                      ? 'border-[#d4af37] bg-[#d4af37] text-[#001f3f] shadow-lg'
-                      : 'border-[#d4af37]/30 text-[#001f3f] hover:border-[#d4af37] hover:bg-[#d4af37]/10'
-                    }`}
-                >
-                  {product.color}
-                </motion.button>
-              </div>
-            )}
-
-            {/* Size Selection */}
-            {product.sizes && product.sizes.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold text-[#001f3f] mb-4 uppercase tracking-wider">
-                  {t('sizes')} <span className="text-[#d4af37]">*</span>
-                </h3>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  {product.sizes.map((size) => (
-                    <motion.button
-                      key={size}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedSize(size)}
-                      className={`py-4 px-4 border-2 rounded-lg font-bold transition-all duration-300 ${selectedSize === size
-                          ? 'border-[#d4af37] bg-[#d4af37] text-[#001f3f] shadow-lg'
-                          : 'border-[#d4af37]/30 text-[#001f3f] hover:border-[#d4af37] hover:bg-[#d4af37]/10'
-                        }`}
-                    >
-                      {size}
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Add to Cart Button with Magnet Effect */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleAddToCart}
-              disabled={!selectedSize}
-              className={`w-full py-5 px-6 rounded-lg font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 shadow-xl ${selectedSize
-                  ? 'bg-gradient-to-r from-[#001f3f] to-[#001f3f] hover:from-[#d4af37] hover:to-[#b8941e] text-white hover:text-[#001f3f] hover:shadow-2xl hover:shadow-[#d4af37]/50'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-            >
-              {selectedSize ? (
-                <>
-                  <ShoppingCart className="w-6 h-6" />
-                  {t('addToCart')}
-                </>
-              ) : (
-                t('selectSize')
-              )}
-            </motion.button>
-
-            {/* Product Description */}
-            {product.description && (
-              <div className="pt-8 border-t-2 border-[#d4af37]/20">
-                <h3
-                  className="text-2xl font-bold text-[#001f3f] mb-4"
-                  style={{ fontFamily: 'Playfair Display, serif' }}
-                >
-                  {t('productDescriptionTitle')}
-                </h3>
-                <p className="text-gray-700 leading-relaxed text-lg">
-                  {product.description}
-                </p>
-              </div>
-            )}
-
-            {/* Shipping Info */}
-            <div className="pt-8 border-t-2 border-[#d4af37]/20">
-              <h3
-                className="text-2xl font-bold text-[#001f3f] mb-4"
-                style={{ fontFamily: 'Playfair Display, serif' }}
-              >
-                {t('shippingInformation')}
-              </h3>
-              <div className="space-y-3 text-gray-700">
-                <p>
-                  <span className="font-bold text-[#001f3f]">{t('freeShipping')}:</span> {t('freeShippingDesc')}
-                </p>
-                <p>
-                  <span className="font-bold text-[#001f3f]">{t('standardShipping')}:</span> {t('standardShippingDesc')}
-                </p>
-                <p>
-                  <span className="font-bold text-[#001f3f]">{t('expressShipping')}:</span> {t('expressShippingDesc')}
-                </p>
-                <p>
-                  <span className="font-bold text-[#001f3f]">{t('returns')}:</span> {t('returnsDesc')}
-                </p>
-              </div>
-            </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

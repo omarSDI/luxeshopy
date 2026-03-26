@@ -5,11 +5,15 @@ export interface Product {
   id: string;
   name: string;
   price: number;
+  image_url?: string;
 }
 
 export interface CartItem extends Product {
   lineId: string;
   quantity: number;
+  variantId?: string;
+  options?: Record<string, string>;
+  // Legacy fields for backward compatibility if needed, but we'll focus on variants
   size?: number;
   color?: string;
 }
@@ -17,7 +21,15 @@ export interface CartItem extends Product {
 interface CartStore {
   items: CartItem[];
   isOpen: boolean;
-  addItem: (product: Product, opts?: { size?: number; color?: string }) => void;
+  addItem: (
+    product: Product, 
+    opts?: { 
+      variantId?: string; 
+      options?: Record<string, string>;
+      size?: number;
+      color?: string;
+    }
+  ) => void;
   removeItem: (lineId: string) => void;
   updateQuantity: (lineId: string, quantity: number) => void;
   clearCart: () => void;
@@ -28,7 +40,8 @@ interface CartStore {
   toggleCart: () => void;
 }
 
-function makeLineId(productId: string, size?: number, color?: string) {
+function makeLineId(productId: string, variantId?: string, size?: number, color?: string) {
+  if (variantId) return `${productId}::variant::${variantId}`;
   return `${productId}::${size ?? ''}::${color ?? ''}`;
 }
 
@@ -39,9 +52,12 @@ export const useCartStore = create<CartStore>()(
       isOpen: false,
 
       addItem: (product, opts) => {
+        const variantId = opts?.variantId;
+        const options = opts?.options;
         const size = opts?.size;
         const color = opts?.color;
-        const lineId = makeLineId(product.id, size, color);
+        
+        const lineId = makeLineId(product.id, variantId, size, color);
 
         const items = get().items;
         const existingItem = items.find((item) => item.lineId === lineId);
@@ -60,7 +76,7 @@ export const useCartStore = create<CartStore>()(
         set({
           items: [
             ...items,
-            { ...product, lineId, quantity: 1, size, color } as CartItem,
+            { ...product, lineId, quantity: 1, variantId, options, size, color } as CartItem,
           ],
         });
       },

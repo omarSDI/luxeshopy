@@ -23,29 +23,6 @@ export async function getProducts(category?: string): Promise<Product[]> {
     const { data, error } = await query;
 
     if (error) {
-      if (
-        normalizedCategory &&
-        /column .*category.* does not exist/i.test(error.message)
-      ) {
-        const fallback = await supabase
-          .from('products')
-          .select('*')
-          .order('created_at', { ascending: true });
-        if (fallback.error) throw fallback.error;
-        return (
-          fallback.data?.map((row: any) => ({
-            id: String(row.id),
-            title: String(row.title ?? ''),
-            price: Number(row.price),
-            description: row.description ?? null,
-            image_url: row.image_url ?? null,
-            sizes: row.sizes ?? null,
-            color: row.color ?? null,
-            category: row.category ?? null,
-            created_at: row.created_at ?? undefined,
-          })) ?? []
-        );
-      }
       console.error('Error fetching products:', error);
       throw error;
     }
@@ -54,13 +31,18 @@ export async function getProducts(category?: string): Promise<Product[]> {
       data?.map((row: any) => ({
         id: String(row.id),
         title: String(row.title ?? ''),
-        price: Number(row.price),
         description: row.description ?? null,
+        price: Number(row.price),
         image_url: row.image_url ?? null,
-        sizes: row.sizes ?? null,
-        color: row.color ?? null,
+        images: row.images ?? [],
+        options: row.options ?? [],
+        variants: row.variants ?? [],
         category: row.category ?? null,
+        cost_price: row.cost_price ?? 0,
+        compare_at_price: row.compare_at_price ?? 0,
+        image_type: row.image_type ?? 'url',
         created_at: row.created_at ?? undefined,
+        updated_at: row.updated_at ?? undefined,
       })) ?? []
     );
   } catch (error) {
@@ -88,70 +70,22 @@ export async function getProductById(id: string): Promise<Product | null> {
     return {
       id: String((data as any).id),
       title: String((data as any).title ?? ''),
-      price: Number((data as any).price),
       description: (data as any).description ?? null,
+      price: Number((data as any).price),
       image_url: (data as any).image_url ?? null,
-      sizes: (data as any).sizes ?? null,
-      color: (data as any).color ?? null,
+      images: (data as any).images ?? [],
+      options: (data as any).options ?? [],
+      variants: (data as any).variants ?? [],
       category: (data as any).category ?? null,
+      cost_price: (data as any).cost_price ?? 0,
+      compare_at_price: (data as any).compare_at_price ?? 0,
+      image_type: (data as any).image_type ?? 'url',
       created_at: (data as any).created_at ?? undefined,
+      updated_at: (data as any).updated_at ?? undefined,
     };
   } catch (error) {
     console.error('Failed to fetch product:', error);
     return null;
-  }
-}
-
-export async function seedExampleProducts(): Promise<{
-  ok: boolean;
-  message: string;
-}> {
-  try {
-    const supabase = createServerClient();
-
-    const { count, error: countError } = await supabase
-      .from('products')
-      .select('id', { count: 'exact', head: true });
-
-    if (countError) {
-      return { ok: false, message: `Count failed: ${countError.message}` };
-    }
-
-    if (typeof count === 'number' && count > 0) {
-      return { ok: true, message: `Already seeded (${count} products).` };
-    }
-
-    const seedRows = [
-      {
-        title: 'Nike Air Max (Red)',
-        price: 549.0,
-        description: 'Iconic cushioning and bold style.',
-        image_url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff',
-        sizes: [39, 40, 41, 42],
-        color: 'Red/White',
-        category: 'men',
-      },
-      {
-        title: 'Adidas UltraBOOST',
-        price: 599.0,
-        description: 'Premium cushioned sneaker.',
-        image_url: 'https://images.unsplash.com/photo-1519861297062-a1eec154f81a',
-        sizes: [39, 40, 41, 42],
-        color: 'White/Black',
-        category: 'women',
-      },
-    ];
-
-    const { error: insertError } = await supabase.from('products').insert(seedRows as any);
-
-    if (insertError) {
-      return { ok: false, message: `Insert failed: ${insertError.message}` };
-    }
-
-    revalidatePath('/');
-    return { ok: true, message: 'Seeded products.' };
-  } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : 'Unknown error' };
   }
 }
 
@@ -165,12 +99,13 @@ export async function createProduct(input: CreateProductInput): Promise<ApiRespo
       .from('products')
       .insert({
         title: input.title,
-        price: input.price,
         description: input.description,
-        category: input.category.toLowerCase(),
-        sizes: input.sizes,
+        price: input.price,
         image_url: input.image_url,
-        color: input.color || null,
+        images: input.images || [],
+        options: input.options || [],
+        variants: input.variants || [],
+        category: input.category.toLowerCase(),
         cost_price: input.cost_price || 0,
         compare_at_price: input.compare_at_price || 0,
         image_type: input.image_type || 'url',
@@ -198,14 +133,18 @@ export async function updateProduct(input: UpdateProductInput): Promise<ApiRespo
     const supabase = createServerClient();
     const { id, ...updates } = input;
 
-    const updateData: any = {};
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
+    
     if (updates.title) updateData.title = updates.title;
-    if (updates.price !== undefined) updateData.price = updates.price;
     if (updates.description !== undefined) updateData.description = updates.description;
-    if (updates.category) updateData.category = updates.category.toLowerCase();
-    if (updates.sizes) updateData.sizes = updates.sizes;
+    if (updates.price !== undefined) updateData.price = updates.price;
     if (updates.image_url !== undefined) updateData.image_url = updates.image_url;
-    if (updates.color !== undefined) updateData.color = updates.color;
+    if (updates.images !== undefined) updateData.images = updates.images;
+    if (updates.options !== undefined) updateData.options = updates.options;
+    if (updates.variants !== undefined) updateData.variants = updates.variants;
+    if (updates.category) updateData.category = updates.category.toLowerCase();
     if (updates.cost_price !== undefined) updateData.cost_price = updates.cost_price;
     if (updates.compare_at_price !== undefined) updateData.compare_at_price = updates.compare_at_price;
     if (updates.image_type !== undefined) updateData.image_type = updates.image_type;
@@ -220,6 +159,8 @@ export async function updateProduct(input: UpdateProductInput): Promise<ApiRespo
     if (error) return { success: false, error: error.message };
 
     revalidatePath('/admin/products');
+    revalidatePath('/admin/products/' + id);
+    revalidatePath('/products/' + id);
     revalidatePath('/shop');
     revalidatePath('/');
 
