@@ -87,15 +87,15 @@ export default function ProductDetailPage() {
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+    <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="w-12 h-12 border-4 border-[#d4af37] border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
   
   if (!product) return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-4">
-        <h1 className="text-4xl font-black italic uppercase mb-8">PRODUCT NOT FOUND</h1>
-        <Link href="/shop" className="px-8 py-4 bg-[#d4af37] text-black font-black rounded-2xl uppercase tracking-widest">BACK TO SHOP</Link>
+    <div className="min-h-screen bg-white text-[#001f3f] flex flex-col items-center justify-center p-4">
+        <h1 className="text-4xl font-extrabold uppercase mb-8" style={{ fontFamily: 'Playfair Display, serif' }}>PRODUIT NON TROUVÉ</h1>
+        <Link href="/shop" className="px-8 py-4 bg-[#001f3f] text-white font-bold rounded-2xl uppercase tracking-widest shadow-xl">RETOUR À LA BOUTIQUE</Link>
     </div>
   );
 
@@ -103,33 +103,33 @@ export default function ProductDetailPage() {
   const price = currentVariant?.price || product.price;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-[#d4af37] selection:text-black pb-20">
+    <div className="min-h-screen bg-white text-[#001f3f] pb-20">
       <Navbar />
       <LiveSalesPopup />
       <StickyBuyBar price={price} onBuy={scrollToCheckout} />
 
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <Link 
           href="/shop" 
-          className="inline-flex items-center gap-2 text-white/40 hover:text-[#d4af37] transition-colors mb-12 group uppercase font-black tracking-widest text-[10px]"
+          className="inline-flex items-center gap-2 text-gray-400 hover:text-[#d4af37] transition-colors mb-8 group font-bold tracking-tight text-sm"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          RETOUR À LA BOUTIQUE
+          {t('backToShop')}
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 xl:gap-24 mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-20 mb-20">
           {/* Visual Gallery Section */}
           <div className="space-y-6">
-            <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-white/5 border border-white/10 group/gallery shadow-2xl">
+            <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gray-50 border border-gray-100 group/gallery shadow-2xl">
               <AnimatePresence mode="wait">
                 <motion.img
                   key={currentImageIndex}
                   src={images[currentImageIndex] || ''}
                   alt={product.title}
-                  initial={{ opacity: 0, scale: 1.1 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.5 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
                   className="w-full h-full object-cover"
                   onError={(e: any) => {
                     e.currentTarget.src = 'https://images.unsplash.com/photo-1546868871-70c122467d9b?q=80&w=800';
@@ -137,25 +137,19 @@ export default function ProductDetailPage() {
                 />
               </AnimatePresence>
 
-              {/* Video Overlay Badge (Simulated) */}
-              <div className="absolute top-6 left-6 px-4 py-2 bg-black/60 backdrop-blur-md rounded-full border border-white/20 flex items-center gap-2">
-                 <div className="w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
-                 <span className="text-[10px] font-black italic uppercase">HD VIDEO SHOWCASE</span>
-              </div>
-
               {images.length > 1 && (
                 <>
                   <button 
                     onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
-                    className="absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-[#d4af37] hover:text-black backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 transition-all opacity-0 group-hover/gallery:opacity-100"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-[#d4af37] hover:text-white backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg transition-all opacity-0 group-hover/gallery:opacity-100"
                   >
-                    <ChevronLeft className="w-6 h-6" />
+                    <ChevronLeft className="w-5 h-5" />
                   </button>
                   <button 
                     onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-[#d4af37] hover:text-black backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 transition-all opacity-0 group-hover/gallery:opacity-100"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-[#d4af37] hover:text-white backdrop-blur-md rounded-2xl flex items-center justify-center shadow-lg transition-all opacity-0 group-hover/gallery:opacity-100"
                   >
-                    <ChevronRight className="w-6 h-6" />
+                    <ChevronRight className="w-5 h-5" />
                   </button>
                 </>
               )}
@@ -167,17 +161,10 @@ export default function ProductDetailPage() {
                   key={idx}
                   onClick={() => setCurrentImageIndex(idx)}
                   className={`relative flex-shrink-0 w-24 aspect-square rounded-2xl overflow-hidden border-2 transition-all ${
-                    currentImageIndex === idx ? 'border-[#d4af37] scale-105 shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'border-white/10 grayscale opacity-40 hover:opacity-100'
+                    currentImageIndex === idx ? 'border-[#d4af37] shadow-xl scale-105' : 'border-transparent grayscale opacity-50 hover:opacity-100'
                   }`}
                 >
-                  <img 
-                    src={img || ''} 
-                    alt="" 
-                    className="w-full h-full object-cover" 
-                    onError={(e: any) => {
-                      e.target.src = 'https://images.unsplash.com/photo-1546868871-70c122467d9b?q=80&w=800';
-                    }}
-                  />
+                  <img src={img || ''} alt="" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -186,26 +173,26 @@ export default function ProductDetailPage() {
           {/* Checkout & Decision Section */}
           <div className="flex flex-col">
             <div className="space-y-6 mb-10">
-              <div className="flex items-center gap-3">
-                <span className="px-5 py-1.5 bg-[#d4af37]/10 text-[#d4af37] rounded-full text-[10px] font-black uppercase tracking-widest border border-[#d4af37]/20">
-                  Édition Limitée
+              <div className="flex items-center gap-4">
+                <span className="px-4 py-1 bg-gray-100 text-[#001f3f] rounded-full text-[10px] font-black uppercase tracking-widest border border-gray-200">
+                  {t('exclusiveEdition')}
                 </span>
-                <span className="flex items-center gap-1.5 text-white/40 text-[10px] font-black uppercase tracking-widest">
-                  <TrendingUp className="w-3 h-3 text-[#d4af37]" />
-                  {viewers} Visionnent
+                <span className="flex items-center gap-1.5 text-gray-400 text-xs font-bold">
+                  <TrendingUp className="w-3.5 h-3.5 text-[#d4af37]" />
+                  {viewers} {t('viewingNow')}
                 </span>
               </div>
 
-              <h1 className="text-5xl lg:text-7xl font-black italic uppercase tracking-tighter leading-none">
+              <h1 className="text-4xl lg:text-5xl font-extrabold text-[#001f3f] tracking-tight leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
                 {product.title}
               </h1>
 
               <div className="flex items-baseline gap-6">
-                <p className="text-5xl font-black text-[#d4af37] tracking-tighter italic">
+                <p className="text-4xl font-black text-[#d4af37]">
                   {price.toFixed(2)} TND
                 </p>
                 {product.compare_at_price !== undefined && Number(product.compare_at_price) > 0 && (
-                  <p className="text-2xl text-white/30 line-through font-bold opacity-40 italic">
+                  <p className="text-xl text-gray-300 line-through font-bold">
                     {Number(product.compare_at_price).toFixed(2)} TND
                   </p>
                 )}
@@ -219,8 +206,8 @@ export default function ProductDetailPage() {
 
             {/* Dynamic Option Selectors */}
             {product.options && (product.options as any[]).map((option) => (
-              <div key={option.name} className="mb-10">
-                <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] mb-4">
+              <div key={option.name} className="mb-8">
+                <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
                   SÉLECTIONNEZ {option.name}
                 </p>
                 <div className="flex flex-wrap gap-3">
@@ -230,10 +217,10 @@ export default function ProductDetailPage() {
                       <button
                         key={val}
                         onClick={() => setSelectedOptions(prev => ({ ...prev, [option.name]: val }))}
-                        className={`px-8 py-4 rounded-2xl text-xs font-black uppercase transition-all duration-300 border-2 ${
+                        className={`px-8 py-3 rounded-xl text-xs font-bold uppercase transition-all duration-300 border-2 ${
                           isActive 
-                          ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.2)]' 
-                          : 'bg-transparent text-white border-white/10 hover:border-white/40'
+                          ? 'bg-[#001f3f] text-white border-[#001f3f] shadow-lg scale-105' 
+                          : 'bg-white text-gray-400 border-gray-100 hover:border-gray-300'
                         }`}
                       >
                         {val}
@@ -244,36 +231,32 @@ export default function ProductDetailPage() {
               </div>
             ))}
 
-            <div id="quick-order" className="mt-4 animate-fade-in">
+            <div id="quick-order" className="mt-4">
               <QuickOrderForm product={product} variant={currentVariant} />
             </div>
 
-            {/* High-Tech Trust Banner */}
-            <div className="mt-12 p-8 rounded-[2rem] bg-white/5 border border-white/10 grid grid-cols-2 gap-8">
+            {/* Trust Signals */}
+            <div className="mt-12 p-8 rounded-[2.5rem] bg-gray-50 border border-gray-100 grid grid-cols-2 gap-8">
                <div className="space-y-2">
-                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4">
-                    <ShieldCheck className="w-5 h-5 text-[#d4af37]" />
-                  </div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#d4af37]">AUTHENTICITÉ</p>
-                  <p className="text-[10px] text-white/40 leading-relaxed">Produits 100% originaux dans leur emballage d'origine.</p>
+                  <ShieldCheck className="w-6 h-6 text-[#d4af37] mb-2" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#001f3f]">{t('authenticityTitle')}</p>
+                  <p className="text-[10px] text-gray-500 leading-relaxed">{t('authenticityDesc')}</p>
                </div>
                <div className="space-y-2">
-                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4">
-                    <Truck className="w-5 h-5 text-[#d4af37]" />
-                  </div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#d4af37]">EXPÉDITION</p>
-                  <p className="text-[10px] text-white/40 leading-relaxed">Livraison express dans toute la Tunisie sous 24/48h.</p>
+                  <Truck className="w-6 h-6 text-[#d4af37] mb-2" />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#001f3f]">{t('expressDelivery')}</p>
+                  <p className="text-[10px] text-gray-500 leading-relaxed">{t('deliveryDesc')}</p>
                </div>
             </div>
           </div>
         </div>
 
-        {/* Extended Description / Specs */}
-        <div className="border-t border-white/10 pt-20">
+        {/* Extended Description */}
+        <div className="border-t border-gray-100 pt-20">
           <div className="max-w-3xl">
-            <h2 className="text-2xl font-black italic uppercase tracking-tighter mb-8">SPÉCIFICATIONS TECHNIQUES</h2>
-            <div className="prose prose-invert max-w-none text-white/60 font-bold leading-relaxed text-sm lg:text-base">
-              {product.description || "Une ingénierie de précision rencontre une esthétique futuriste. Ce produit est conçu pour ceux qui exigent l'excellence à chaque instant."}
+            <h2 className="text-2xl font-bold text-[#001f3f] mb-8" style={{ fontFamily: 'Playfair Display, serif' }}>DESCRIPTION DÉTAILLÉE</h2>
+            <div className="prose prose-slate max-w-none text-gray-600 font-medium leading-relaxed">
+              {product.description}
             </div>
           </div>
         </div>

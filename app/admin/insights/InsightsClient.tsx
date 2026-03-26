@@ -179,8 +179,8 @@ export default function InsightsClient({ orders }: InsightsClientProps) {
                     <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-10 relative z-10" style={{ fontFamily: 'Playfair Display, serif' }}>
                         Operational {t('allOrders')}
                     </h3>
-                    <div className="flex-1 w-full relative z-10" dir="ltr">
-                        <ResponsiveContainer width="100%" height="100%">
+                    <div className="flex-1 w-full relative z-10 min-h-[400px]" dir="ltr">
+                        <ResponsiveContainer width="100%" height="100%" minHeight={400}>
                             <PieChart>
                                 <Pie
                                     data={statusData}
