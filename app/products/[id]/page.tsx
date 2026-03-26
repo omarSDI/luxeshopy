@@ -131,6 +131,9 @@ export default function ProductDetailPage() {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.5 }}
                   className="w-full h-full object-cover"
+                  onError={(e: any) => {
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1546868871-70c122467d9b?q=80&w=800';
+                  }}
                 />
               </AnimatePresence>
 
@@ -167,7 +170,14 @@ export default function ProductDetailPage() {
                     currentImageIndex === idx ? 'border-[#00FF41] scale-105 shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'border-white/10 grayscale opacity-40 hover:opacity-100'
                   }`}
                 >
-                  <img src={img || ''} alt="" className="w-full h-full object-cover" />
+                  <img 
+                    src={img || ''} 
+                    alt="" 
+                    className="w-full h-full object-cover" 
+                    onError={(e: any) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1546868871-70c122467d9b?q=80&w=800';
+                    }}
+                  />
                 </button>
               ))}
             </div>
@@ -194,9 +204,9 @@ export default function ProductDetailPage() {
                 <p className="text-5xl font-black text-[#00FF41] tracking-tighter italic">
                   {price.toFixed(2)} TND
                 </p>
-                {product.compare_at_price && (
-                  <p className="text-2xl text-white/30 line-through font-bold">
-                    {product.compare_at_price.toFixed(2)} TND
+                {product.compare_at_price !== undefined && Number(product.compare_at_price) > 0 && (
+                  <p className="text-2xl text-white/30 line-through font-bold opacity-40 italic">
+                    {Number(product.compare_at_price).toFixed(2)} TND
                   </p>
                 )}
               </div>

@@ -34,12 +34,16 @@ export default function VisitorTracker() {
       else source = 'Other';
     }
 
-    // 4. Determine Device Type
+    // 4. Determine Device Type (Enhanced Detection)
+    const ua = navigator.userAgent;
+    const isMobileUA = /Mobi|Android|iPhone/i.test(ua);
+    const isTabletUA = /iPad|Tablet/i.test(ua);
+    const isSmallScreen = window.innerWidth < 768;
+
     let deviceType = 'Desktop';
-    const ua = navigator.userAgent.toLowerCase();
-    if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+    if (isTabletUA) {
       deviceType = 'Tablet';
-    } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) {
+    } else if (isMobileUA || isSmallScreen) {
       deviceType = 'Mobile';
     }
 
