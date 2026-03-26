@@ -13,8 +13,12 @@ export default function AdminSeedButton() {
     setMessage(null);
     startTransition(async () => {
       const res = await seedExampleProducts();
-      setMessage(res.message);
-      router.refresh();
+      if (res.success) {
+        setMessage('Seeding successful!');
+        router.refresh();
+      } else {
+        setMessage(`Error: ${res.error}`);
+      }
     });
   };
 

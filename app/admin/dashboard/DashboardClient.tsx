@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useMemo, useEffect } from 'react';
 import StatsCard from '../components/StatsCard';
 import SalesChart from '../components/SalesChart';

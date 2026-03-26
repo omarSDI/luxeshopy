@@ -38,6 +38,7 @@ export async function getProducts(category?: string): Promise<Product[]> {
         options: row.options ?? [],
         variants: row.variants ?? [],
         category: row.category ?? null,
+        stock: Number(row.stock ?? 0),
         cost_price: row.cost_price ?? 0,
         compare_at_price: row.compare_at_price ?? 0,
         image_type: row.image_type ?? 'url',
@@ -77,6 +78,7 @@ export async function getProductById(id: string): Promise<Product | null> {
       options: (data as any).options ?? [],
       variants: (data as any).variants ?? [],
       category: (data as any).category ?? null,
+      stock: Number((data as any).stock ?? 0),
       cost_price: (data as any).cost_price ?? 0,
       compare_at_price: (data as any).compare_at_price ?? 0,
       image_type: (data as any).image_type ?? 'url',
@@ -187,5 +189,69 @@ export async function deleteProduct(id: string): Promise<ApiResponse> {
     return { success: true };
   } catch (error) {
     return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+  }
+}
+
+export async function seedExampleProducts(): Promise<ApiResponse> {
+  try {
+    const supabase = createServerClient();
+    
+    // Clear existing (optional, but good for demo)
+    // await supabase.from('products').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+    const examples = [
+      {
+        title: 'Luxe Smartwatch Series 7',
+        price: 349.00,
+        compare_at_price: 399.00,
+        description: 'The ultimate wearable experience. Fusion of tech and elegance.',
+        image_url: 'https://images.unsplash.com/photo-1546868871-70c122467d9b?q=80&w=800',
+        images: [
+           'https://images.unsplash.com/photo-1546868871-70c122467d9b?q=80&w=800',
+           'https://images.unsplash.com/photo-1544117518-e79632344796?q=80&w=800',
+           'https://images.unsplash.com/photo-1508685096489-7aac29bca228?q=80&w=800'
+        ],
+        category: 'tech',
+        stock: 50,
+        options: [
+            { name: 'Color', values: ['Midnight', 'Starlight', 'Silver'] },
+            { name: 'Size', values: ['41mm', '45mm'] }
+        ],
+        variants: [
+            { id: 'v1', options: { Color: 'Midnight', Size: '45mm' }, price: 349, stock: 15, image_url: 'https://images.unsplash.com/photo-1546868871-70c122467d9b?q=80&w=800' },
+            { id: 'v2', options: { Color: 'Starlight', Size: '45mm' }, price: 359, stock: 10, image_url: 'https://images.unsplash.com/photo-1544117518-e79632344796?q=80&w=800' }
+        ]
+      },
+      {
+        title: 'Precision Quartz Chronograph',
+        price: 289.00,
+        compare_at_price: 350.00,
+        description: 'Masterpiece of accuracy. Built for the modern professional.',
+        image_url: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=800',
+        images: [
+            'https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=800',
+            'https://images.unsplash.com/photo-1522312346375-d1ad50559b10?q=80&w=800'
+        ],
+        category: 'men',
+        stock: 25,
+        options: [
+            { name: 'Material', values: ['Steel', 'Leather'] }
+        ],
+        variants: [
+            { id: 'v3', options: { Material: 'Steel' }, price: 289, stock: 12, image_url: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?q=80&w=800' },
+            { id: 'v4', options: { Material: 'Leather' }, price: 269, stock: 13, image_url: 'https://images.unsplash.com/photo-1522312346375-d1ad50559b10?q=80&w=800' }
+        ]
+      }
+    ];
+
+    const { error } = await supabase.from('products').insert(examples);
+    if (error) throw error;
+
+    revalidatePath('/shop');
+    revalidatePath('/');
+    return { success: true };
+  } catch (error) {
+    console.error('Seed Error:', error);
+    return { success: false, error: String(error) };
   }
 }
