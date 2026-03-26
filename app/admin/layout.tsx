@@ -23,12 +23,16 @@ export default async function AdminLayout({
 
   // Authenticated - show sidebar layout
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#050505] text-white">
       <AdminRealtimeProvider>
         <AdminSidebar />
-        <div className="lg:pl-64 flex flex-col min-h-screen">
+        <div className="lg:pl-64 flex flex-col min-h-screen relative">
           <AdminTopBar />
-          <main className="flex-1 py-8 px-4 sm:px-6 lg:px-8 bg-gray-50">{children}</main>
+          <main className="flex-1 py-8 px-4 sm:px-6 lg:px-10 bg-[#050505]">
+            <div className="max-w-[1600px] mx-auto">
+              {children}
+            </div>
+          </main>
         </div>
       </AdminRealtimeProvider>
     </div>

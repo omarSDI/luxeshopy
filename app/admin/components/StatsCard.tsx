@@ -8,7 +8,7 @@ interface StatsCardProps {
   icon: React.ReactNode;
   trend?: string;
   variant?: 'default' | 'warning' | 'success';
-  bgIcon?: React.ReactNode;
+  description?: string;
 }
 
 export default function StatsCard({
@@ -17,63 +17,44 @@ export default function StatsCard({
   icon,
   trend,
   variant = 'default',
-  bgIcon,
+  description,
 }: StatsCardProps) {
-  const getGradient = () => {
-    switch (variant) {
-      case 'warning': return 'from-yellow-50/50 to-white';
-      case 'success': return 'from-green-50/50 to-white';
-      default: return 'from-white to-white';
-    }
-  };
-
-  const getIconBg = () => {
-    switch (variant) {
-      case 'warning': return 'bg-yellow-100 text-yellow-600';
-      case 'success': return 'bg-emerald-100 text-emerald-600';
-      default: return 'bg-[#0a0a0a]/5 text-[#0a0a0a]';
-    }
-  };
-
   return (
     <motion.div
-      whileHover={{ y: -4, boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)' }}
-      className={`relative overflow-hidden bg-gradient-to-br ${getGradient()} rounded-[2rem] border border-gray-100 p-8 shadow-sm transition-all duration-300`}
+      whileHover={{ y: -5, scale: 1.02 }}
+      className="relative overflow-hidden bg-[#0a0a0a] rounded-[2.5rem] border border-white/10 p-10 shadow-2xl transition-all duration-300 group"
     >
-      {/* Background Large Icon */}
-      {bgIcon && (
-        <div className="absolute -right-4 -top-4 text-gray-100 opacity-40 scale-[2.5] pointer-events-none transform -rotate-12 transition-transform duration-500 group-hover:rotate-0">
-          {bgIcon}
-        </div>
-      )}
-
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+      
       <div className="relative z-10">
-        <div className="flex items-center justify-between mb-6">
-          <div className={`p-4 rounded-2xl ${getIconBg()}`}>
+        <div className="flex items-center justify-between mb-8">
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all duration-500 ${
+            variant === 'success' ? 'bg-[#00FF41]/10 border-[#00FF41]/20 text-[#00FF41]' :
+            variant === 'warning' ? 'bg-orange-500/10 border-orange-500/20 text-orange-500' :
+            'bg-white/5 border-white/10 text-[#d4af37]'
+          }`}>
             {icon}
           </div>
           {trend && (
-            <div className={`text-sm font-bold flex items-center gap-1 px-3 py-1 rounded-full ${trend.startsWith('+') ? 'text-emerald-600 bg-emerald-50' : 'text-red-600 bg-red-50'}`}>
+            <div className={`text-[10px] font-black flex items-center gap-1 px-4 py-1.5 rounded-full uppercase tracking-widest ${
+              trend.startsWith('+') ? 'text-[#00FF41] bg-[#00FF41]/10' : 'text-red-500 bg-red-500/10'
+            }`}>
               {trend}
             </div>
           )}
         </div>
 
         <div>
-          <p className="text-sm font-bold text-gray-400 mb-1 uppercase tracking-[0.1em]">
+          <p className="text-[10px] font-black text-white/30 mb-2 uppercase tracking-[0.4em]">
             {title}
           </p>
           <div className="flex flex-col">
-            <p
-              className="text-4xl font-extrabold text-[#0a0a0a]"
-              style={{ fontFamily: 'Playfair Display, serif' }}
-            >
+            <h3 className="text-4xl font-black text-white italic tracking-tighter" style={{ fontFamily: 'Playfair Display, serif' }}>
               {value}
-            </p>
-            {/* Subtitle/Explanation */}
-            {variant === 'success' && (
-              <p className="text-[10px] text-gray-400 font-medium mt-1 italic">
-                (Basé sur une marge de 30% estimée)
+            </h3>
+            {description && (
+              <p className="text-[9px] text-[#00FF41] font-black mt-3 uppercase tracking-widest opacity-60">
+                {description}
               </p>
             )}
           </div>

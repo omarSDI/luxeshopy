@@ -91,26 +91,28 @@ export default function DashboardClient({ stats: initialStats, chartData: initia
     };
 
     return (
-        <div className="max-w-[1700px] mx-auto space-y-10 px-4 sm:px-6 lg:px-8 py-8 animate-fade-in bg-gray-50/50 min-h-screen">
-            {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-4">
+        <div className="max-w-[1700px] mx-auto space-y-12 px-6 lg:px-12 py-10 animate-fade-in min-h-screen">
+            {/* Header Area */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-4">
                 <div>
-                    <h1 className="text-4xl font-extrabold text-[#001f3f] tracking-tight uppercase" style={{ fontFamily: 'Playfair Display, serif' }}>
-                        {t('welcomeBack')}, <span className="text-[#c5a059]">Admin</span>
+                    <h1 className="text-5xl font-black text-white italic tracking-tighter uppercase leading-none" style={{ fontFamily: 'Playfair Display, serif' }}>
+                        {t('welcomeBack')}, <span className="text-[#d4af37]">Director</span>
                     </h1>
-                    <p className="text-gray-400 font-bold mt-1 uppercase tracking-widest text-[10px]">OPERATIONAL COMMAND CENTER • {new Date().toLocaleDateString()}</p>
+                    <p className="text-[#00FF41] text-[10px] font-black uppercase tracking-[0.5em] mt-4">
+                        Core Systems Online • {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
                 </div>
                 
-                {/* Time Filter Toggle */}
-                <div className="flex items-center bg-white p-1 rounded-2xl shadow-sm border border-gray-100">
+                {/* Time Filter Space Station Toggle */}
+                <div className="flex items-center bg-white/5 p-1 rounded-2xl border border-white/10 backdrop-blur-md">
                     {(['today', 'week', 'month'] as const).map((range) => (
                         <button
                             key={range}
                             onClick={() => setTimeFilter(range)}
-                            className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                            className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                                 timeFilter === range 
-                                ? 'bg-black text-white shadow-lg' 
-                                : 'text-gray-400 hover:text-black hover:bg-gray-50'
+                                ? 'bg-[#d4af37] text-black shadow-[0_0_20px_rgba(212,175,55,0.3)]' 
+                                : 'text-gray-500 hover:text-white hover:bg-white/5'
                             }`}
                         >
                             {range}
@@ -119,96 +121,105 @@ export default function DashboardClient({ stats: initialStats, chartData: initia
                 </div>
             </div>
 
-            {/* Primary Stats Grid */}
+            {/* Primary Stats Matrix */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <StatsCard
-                    title="REVENU TOTAL"
-                    value={`${derivedStats.totalSales.toFixed(2)} TND`}
-                    icon={<DollarSign className="w-8 h-8" />}
-                    bgIcon={<DollarSign />}
+                    title="Gross Revenue"
+                    value={`${derivedStats.totalSales.toFixed(0)} TND`}
+                    icon={<DollarSign className="w-6 h-6" />}
                     trend="+12.5%"
+                    description="Total filtered revenue"
                 />
                 <StatsCard
-                    title="BÉNÉFICE TOTAL"
-                    value={`${derivedStats.totalProfit.toFixed(2)} TND`}
-                    icon={<TrendingUp className="w-8 h-8" />}
-                    bgIcon={<TrendingUp />}
+                    title="Net Profit"
+                    value={`${derivedStats.totalProfit.toFixed(0)} TND`}
+                    icon={<TrendingUp className="w-6 h-6" />}
                     trend="+8.2%"
                     variant="success"
+                    description="Estimated 30% margin"
                 />
                 <StatsCard
-                    title={t('orders')}
+                    title="Volume"
                     value={derivedStats.totalOrders.toString()}
-                    icon={<ShoppingBag className="w-8 h-8" />}
-                    bgIcon={<ShoppingBag />}
+                    icon={<ShoppingBag className="w-6 h-6" />}
+                    description="Total transactions"
                 />
                 <StatsCard
-                    title={t('pending')}
+                    title="Pending Nodes"
                     value={derivedStats.pendingOrders.toString()}
-                    icon={<Clock className="w-8 h-8" />}
-                    bgIcon={<Clock />}
+                    icon={<Clock className="w-6 h-6" />}
                     variant="warning"
+                    description="Awaiting processing"
                 />
             </div>
 
-            {/* Main Content Areas */}
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-10">
-                {/* Left: Sales Chart (7 columns) */}
-                <div className="xl:col-span-8 space-y-10">
-                    <div className="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-gray-200/50 border border-gray-100 min-h-[500px] flex flex-col">
-                        <div className="flex items-center justify-between mb-10">
+            {/* Content Architecture */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-12">
+                {/* Performance Analytics */}
+                <div className="xl:col-span-8 space-y-12">
+                    <div className="bg-[#0a0a0a] rounded-[3rem] p-12 shadow-2xl border border-white/10 relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/5 to-transparent pointer-events-none" />
+                        
+                        <div className="flex items-center justify-between mb-12 relative z-10">
                             <div>
-                                <h2 className="text-2xl font-black text-[#001f3f] uppercase italic italic tracking-tighter" style={{ fontFamily: 'Playfair Display, serif' }}>
-                                    Sales Performance Trends
+                                <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter" style={{ fontFamily: 'Playfair Display, serif' }}>
+                                    Revenue Trajectory
                                 </h2>
-                                <p className="text-gray-400 font-bold mt-1 uppercase tracking-widest text-[10px]">Revenue Matrix over time</p>
+                                <p className="text-[#00FF41] font-black mt-1 uppercase tracking-widest text-[9px] opacity-80">Visualizing financial synchronization</p>
                             </div>
                         </div>
-                        <div className="flex-1">
+                        <div className="h-[400px] relative z-10">
                             <SalesChart data={derivedChartData} />
                         </div>
                     </div>
 
-                    {/* All Orders Table underneath chart */}
-                    <div className="bg-white rounded-[2.5rem] p-10 shadow-xl border border-gray-100">
-                        <div className="flex items-center justify-between mb-8">
-                            <h2 className="text-2xl font-black text-[#001f3f] uppercase italic tracking-tighter" style={{ fontFamily: 'Playfair Display, serif' }}>
-                                Recent Transactions
+                    {/* Operational Stream */}
+                    <div className="bg-[#0a0a0a] rounded-[3rem] p-12 shadow-2xl border border-white/10 relative overflow-hidden">
+                        <div className="absolute top-0 right-12 -translate-y-1/2 bg-[#d4af37] text-black px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest">Live Feed</div>
+                        
+                        <div className="flex items-center justify-between mb-12">
+                            <h2 className="text-2xl font-black text-white uppercase italic tracking-tighter" style={{ fontFamily: 'Playfair Display, serif' }}>
+                                Transaction Stream
                             </h2>
-                            <button className="text-[10px] font-black underline tracking-widest text-[#c5a059]">VIEW ARCHIVE</button>
+                            <button className="text-[10px] font-black tracking-widest text-[#d4af37] hover:underline transition-all">TERMINAL ACCESS</button>
                         </div>
                         <div className="overflow-x-auto">
-                            <RecentOrdersTable orders={orders.slice(0, 10)} onStatusUpdate={handleStatusUpdate} />
+                            <RecentOrdersTable orders={orders.slice(0, 8)} onStatusUpdate={handleStatusUpdate} />
                         </div>
                     </div>
                 </div>
 
-                {/* Right: Analytics & Tools (4 columns) */}
-                <div className="xl:col-span-4 space-y-10">
-                    {/* Traffic Source Analytics Card */}
+                {/* Satellite Intelligence */}
+                <div className="xl:col-span-4 space-y-12">
                     <TrafficStatsCard stats={trafficStats} loading={loadingTraffic} />
 
-                    {/* Inventory Brief */}
-                    <div className="bg-[#001f3f] rounded-[2.5rem] p-8 shadow-2xl text-white relative overflow-hidden group">
-                        <div className="relative z-10 flex justify-between items-start">
+                    {/* Global Inventory Hub */}
+                    <div className="bg-[#0a0a0a] rounded-[3rem] p-10 border border-white/10 shadow-2xl relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+                        <div className="relative z-10 flex justify-between items-center">
                              <div>
-                                <p className="text-[10px] font-black text-white/50 uppercase tracking-[0.3em] mb-1">Stock Portfolio</p>
-                                <h3 className="text-4xl font-black italic">{derivedStats.totalProducts}</h3>
-                                <p className="text-xs font-bold text-[#c5a059] mt-2">ACTIVE SKUS IN GALLERY</p>
+                                <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] mb-2">Inventory Matrix</p>
+                                <h3 className="text-5xl font-black text-white italic tracking-tighter line-none">{derivedStats.totalProducts}</h3>
+                                <div className="flex items-center gap-2 mt-4">
+                                    <div className="w-2 h-2 bg-[#00FF41] rounded-full animate-pulse" />
+                                    <p className="text-[9px] font-black text-[#00FF41] uppercase tracking-[0.2em]">Active SKUs Synchronized</p>
+                                </div>
                              </div>
-                             <Package className="w-12 h-12 text-[#c5a059] opacity-20 group-hover:scale-110 transition-transform" />
+                             <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center border border-white/5 group-hover:rotate-12 transition-transform">
+                                <Package className="w-10 h-10 text-[#d4af37]" />
+                             </div>
                         </div>
-                        <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
                     </div>
 
-                    {/* Quick Tools or Promo (Optional) */}
-                    <div className="bg-gradient-to-br from-[#c5a059] to-[#b8941e] rounded-[2.5rem] p-8 shadow-xl text-[#001f3f]">
-                         <h4 className="text-lg font-black uppercase italic tracking-tighter mb-4">Pro Insights</h4>
-                         <p className="text-sm font-bold opacity-80 leading-snug">
-                             Your conversion rate is trending upwards. Consider launching a promo for "Direct" traffic to reward loyal customers.
+                    {/* Strategic Intelligence */}
+                    <div className="bg-gradient-to-br from-[#d4af37] to-[#8a6d1d] rounded-[3rem] p-10 shadow-2xl relative overflow-hidden">
+                         <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/20 rounded-full blur-3xl pointer-events-none" />
+                         <h4 className="text-xl font-black text-black uppercase italic tracking-tighter mb-6 relative z-10">AI Directive</h4>
+                         <p className="text-sm font-black text-black/80 leading-relaxed relative z-10">
+                             Optimization Protocol: Your mobile conversion rate ({trafficStats?.mobileConversion || '8.2'}%) outpaces desktop by 24%. Recommended: Deploy mobile-exclusive lightning deals for the next 48 hours to capitalize on movement.
                          </p>
-                         <button className="mt-6 px-6 py-3 bg-[#001f3f] text-white rounded-xl text-[10px] font-black uppercase tracking-widest">
-                             GENERATE REPORT
+                         <button className="mt-8 px-10 py-4 bg-black text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all relative z-10 shadow-2xl">
+                             ACTIVATE PROTOCOL
                          </button>
                     </div>
                 </div>

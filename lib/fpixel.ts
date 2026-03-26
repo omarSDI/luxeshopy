@@ -1,4 +1,5 @@
-export const FB_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || 'LUXE_PIXEL_DEFAULT';
+const envPixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
+export const FB_PIXEL_ID = (envPixelId && envPixelId !== 'null' && envPixelId !== 'undefined') ? envPixelId : 'LUXE_PIXEL_DEFAULT';
 
 export const pageview = () => {
   if (typeof window !== 'undefined' && (window as any).fbq) {

@@ -88,14 +88,14 @@ export default function ProductDetailPage() {
 
   if (loading) return (
     <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-      <div className="w-12 h-12 border-4 border-[#00FF41] border-t-transparent rounded-full animate-spin"></div>
+      <div className="w-12 h-12 border-4 border-[#d4af37] border-t-transparent rounded-full animate-spin"></div>
     </div>
   );
   
   if (!product) return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-4">
         <h1 className="text-4xl font-black italic uppercase mb-8">PRODUCT NOT FOUND</h1>
-        <Link href="/shop" className="px-8 py-4 bg-[#00FF41] text-black font-black rounded-2xl uppercase tracking-widest">BACK TO SHOP</Link>
+        <Link href="/shop" className="px-8 py-4 bg-[#d4af37] text-black font-black rounded-2xl uppercase tracking-widest">BACK TO SHOP</Link>
     </div>
   );
 
@@ -103,7 +103,7 @@ export default function ProductDetailPage() {
   const price = currentVariant?.price || product.price;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-[#00FF41] selection:text-black pb-20">
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-[#d4af37] selection:text-black pb-20">
       <Navbar />
       <LiveSalesPopup />
       <StickyBuyBar price={price} onBuy={scrollToCheckout} />
@@ -111,7 +111,7 @@ export default function ProductDetailPage() {
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
         <Link 
           href="/shop" 
-          className="inline-flex items-center gap-2 text-white/40 hover:text-[#00FF41] transition-colors mb-12 group uppercase font-black tracking-widest text-[10px]"
+          className="inline-flex items-center gap-2 text-white/40 hover:text-[#d4af37] transition-colors mb-12 group uppercase font-black tracking-widest text-[10px]"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           RETOUR À LA BOUTIQUE
@@ -147,13 +147,13 @@ export default function ProductDetailPage() {
                 <>
                   <button 
                     onClick={() => setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)}
-                    className="absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-[#00FF41] hover:text-black backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 transition-all opacity-0 group-hover/gallery:opacity-100"
+                    className="absolute left-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-[#d4af37] hover:text-black backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 transition-all opacity-0 group-hover/gallery:opacity-100"
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
                   <button 
                     onClick={() => setCurrentImageIndex((prev) => (prev + 1) % images.length)}
-                    className="absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-[#00FF41] hover:text-black backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 transition-all opacity-0 group-hover/gallery:opacity-100"
+                    className="absolute right-6 top-1/2 -translate-y-1/2 w-14 h-14 bg-black/40 hover:bg-[#d4af37] hover:text-black backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 transition-all opacity-0 group-hover/gallery:opacity-100"
                   >
                     <ChevronRight className="w-6 h-6" />
                   </button>
@@ -167,7 +167,7 @@ export default function ProductDetailPage() {
                   key={idx}
                   onClick={() => setCurrentImageIndex(idx)}
                   className={`relative flex-shrink-0 w-24 aspect-square rounded-2xl overflow-hidden border-2 transition-all ${
-                    currentImageIndex === idx ? 'border-[#00FF41] scale-105 shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'border-white/10 grayscale opacity-40 hover:opacity-100'
+                    currentImageIndex === idx ? 'border-[#d4af37] scale-105 shadow-[0_0_15px_rgba(0,255,65,0.3)]' : 'border-white/10 grayscale opacity-40 hover:opacity-100'
                   }`}
                 >
                   <img 
@@ -187,11 +187,11 @@ export default function ProductDetailPage() {
           <div className="flex flex-col">
             <div className="space-y-6 mb-10">
               <div className="flex items-center gap-3">
-                <span className="px-5 py-1.5 bg-[#00FF41]/10 text-[#00FF41] rounded-full text-[10px] font-black uppercase tracking-widest border border-[#00FF41]/20">
+                <span className="px-5 py-1.5 bg-[#d4af37]/10 text-[#d4af37] rounded-full text-[10px] font-black uppercase tracking-widest border border-[#d4af37]/20">
                   Édition Limitée
                 </span>
                 <span className="flex items-center gap-1.5 text-white/40 text-[10px] font-black uppercase tracking-widest">
-                  <TrendingUp className="w-3 h-3 text-[#00FF41]" />
+                  <TrendingUp className="w-3 h-3 text-[#d4af37]" />
                   {viewers} Visionnent
                 </span>
               </div>
@@ -201,7 +201,7 @@ export default function ProductDetailPage() {
               </h1>
 
               <div className="flex items-baseline gap-6">
-                <p className="text-5xl font-black text-[#00FF41] tracking-tighter italic">
+                <p className="text-5xl font-black text-[#d4af37] tracking-tighter italic">
                   {price.toFixed(2)} TND
                 </p>
                 {product.compare_at_price !== undefined && Number(product.compare_at_price) > 0 && (
@@ -252,16 +252,16 @@ export default function ProductDetailPage() {
             <div className="mt-12 p-8 rounded-[2rem] bg-white/5 border border-white/10 grid grid-cols-2 gap-8">
                <div className="space-y-2">
                   <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4">
-                    <ShieldCheck className="w-5 h-5 text-[#00FF41]" />
+                    <ShieldCheck className="w-5 h-5 text-[#d4af37]" />
                   </div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#00FF41]">AUTHENTICITÉ</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#d4af37]">AUTHENTICITÉ</p>
                   <p className="text-[10px] text-white/40 leading-relaxed">Produits 100% originaux dans leur emballage d'origine.</p>
                </div>
                <div className="space-y-2">
                   <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4">
-                    <Truck className="w-5 h-5 text-[#00FF41]" />
+                    <Truck className="w-5 h-5 text-[#d4af37]" />
                   </div>
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#00FF41]">EXPÉDITION</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#d4af37]">EXPÉDITION</p>
                   <p className="text-[10px] text-white/40 leading-relaxed">Livraison express dans toute la Tunisie sous 24/48h.</p>
                </div>
             </div>

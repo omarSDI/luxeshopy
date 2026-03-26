@@ -15,38 +15,30 @@ export default function AdminTopBar() {
     const [showNotifications, setShowNotifications] = useState(false);
 
     return (
-        <header className={`border-b px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm transition-colors duration-300 ${isDarkMode ? 'bg-[#001f3f] border-[#d4af37]/30' : 'bg-white border-[#d4af37]/20'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+        <header className="px-8 py-5 flex items-center justify-between sticky top-0 z-30 bg-[#050505]/80 backdrop-blur-xl border-b border-white/5 shadow-2xl" dir={isRTL ? 'rtl' : 'ltr'}>
 
             {/* Left Side: Brand Date/Time */}
-            <div className="flex items-center gap-6 text-sm">
-                <div className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'} font-medium`}>
-                    {new Date().toLocaleDateString(language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            <div className="flex items-center gap-8">
+                <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-[#d4af37] uppercase tracking-[0.3em]">System Time</span>
+                    <span className="text-white/40 text-[10px] font-bold uppercase mt-0.5">
+                        {new Date().toLocaleDateString(language, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </span>
                 </div>
-                <a
-                    href="/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded border transition-all shadow-sm ${isDarkMode
-                        ? 'bg-[#d4af37] text-[#001f3f] border-[#d4af37] hover:bg-white hover:border-white'
-                        : 'bg-[#001f3f] text-[#d4af37] border-[#d4af37] hover:bg-[#d4af37] hover:text-[#001f3f]'
-                        }`}
-                >
-                    View My Store
-                </a>
             </div>
 
             {/* Right Side: Actions */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
 
                 {/* Language Switcher */}
-                <div className="flex items-center gap-2 me-2">
+                <div className="flex items-center gap-2">
                     {['en', 'fr', 'ar'].map((lang) => (
                         <button
                             key={lang}
                             onClick={() => setLanguage(lang as any)}
-                            className={`text-xs font-bold px-2 py-1 rounded uppercase transition-colors ${language === lang
-                                ? (isDarkMode ? 'bg-[#d4af37] text-[#001f3f]' : 'bg-[#001f3f] text-[#d4af37]')
-                                : (isDarkMode ? 'text-gray-400 hover:text-[#d4af37]' : 'text-gray-400 hover:text-[#001f3f]')
+                            className={`text-[10px] font-black px-3 py-1.5 rounded-lg uppercase transition-all ${language === lang
+                                ? 'bg-[#d4af37] text-black shadow-[0_5px_15px_rgba(212,175,55,0.3)]'
+                                : 'text-white/30 hover:text-white hover:bg-white/5'
                                 }`}
                         >
                             {lang}
@@ -54,19 +46,11 @@ export default function AdminTopBar() {
                     ))}
                 </div>
 
-                {/* Theme Toggle */}
-                <button
-                    onClick={toggleTheme}
-                    className={`p-2 transition-colors rounded-full ${isDarkMode ? 'text-[#d4af37] hover:bg-white/10' : 'text-gray-400 hover:text-[#d4af37] hover:bg-gray-100'}`}
-                >
-                    {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-                </button>
-
                 {/* Notifications */}
                 <div className="relative">
                     <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
                         onClick={() => {
                             setShowNotifications(!showNotifications);
                             if (!showNotifications) {
@@ -74,14 +58,14 @@ export default function AdminTopBar() {
                                 if (unreadCount > 0) markAllRead();
                             }
                         }}
-                        className={`p-2 transition-colors relative ${isDarkMode ? 'text-gray-400 hover:text-[#d4af37]' : 'text-gray-400 hover:text-[#d4af37]'}`}
+                        className="p-3 text-white/30 hover:text-[#00FF41] hover:bg-white/5 rounded-2xl relative transition-all"
                     >
-                        <Bell className="w-5 h-5" />
+                        <Bell className="w-5 h-5 transition-colors" />
                         {unreadNotificationCount > 0 && (
                             <motion.span
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white border-2 border-white shadow-sm"
+                                className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#00FF41] text-[10px] font-black text-black border-2 border-[#050505] shadow-[0_0_15px_rgba(0,255,65,0.5)]"
                             >
                                 {unreadNotificationCount > 9 ? '9+' : unreadNotificationCount}
                             </motion.span>
@@ -91,29 +75,25 @@ export default function AdminTopBar() {
                     <AnimatePresence>
                         {showNotifications && (
                             <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                className={`absolute right-0 rtl:left-0 rtl:right-auto mt-2 w-80 rounded-lg shadow-xl border py-2 z-50 max-h-96 overflow-y-auto ${isDarkMode ? 'bg-[#001f3f] border-[#d4af37]/30 text-white' : 'bg-white border-gray-100'
-                                    }`}
+                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                                className={`absolute right-0 rtl:left-0 rtl:right-auto mt-4 w-96 bg-[#0a0a0a] border border-white/5 rounded-[2rem] shadow-[0_30px_60px_rgba(0,0,0,0.8)] py-4 z-50 max-h-[500px] overflow-y-auto scrollbar-hide`}
                             >
-                                <div className={`px-4 py-2 border-b flex justify-between items-center ${isDarkMode ? 'border-[#d4af37]/20' : 'border-gray-100'}`}>
-                                    <h3 className={`font-bold ${isDarkMode ? 'text-[#d4af37]' : 'text-[#001f3f]'}`}>Notifications</h3>
-                                    <span className="text-xs text-gray-500">{notifications.length} new</span>
+                                <div className="px-8 py-4 border-b border-white/5 flex justify-between items-center">
+                                    <h3 className="text-[10px] font-black text-[#d4af37] uppercase tracking-[0.4em]">Intelligence Feed</h3>
+                                    <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">{notifications.length} Nodes</span>
                                 </div>
                                 {notifications.length === 0 ? (
-                                    <div className="p-4 text-center text-gray-500 text-sm">
-                                        No new notifications
+                                    <div className="p-10 text-center text-white/20 text-[10px] font-black uppercase tracking-widest italic">
+                                        No active transmissions
                                     </div>
                                 ) : (
                                     notifications.map((notif: any) => (
-                                        <div key={notif.id} className={`px-4 py-3 border-b last:border-0 transition-colors ${isDarkMode
-                                            ? `hover:bg-white/5 border-[#d4af37]/10 ${!notif.read ? 'bg-white/10' : ''}`
-                                            : `hover:bg-gray-50 border-gray-50 ${!notif.read ? 'bg-blue-50/50' : ''}`
-                                            }`}>
-                                            <p className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-[#001f3f]'}`}>{notif.title}</p>
-                                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{notif.message}</p>
-                                            <p className="text-[10px] text-gray-400 mt-1">{new Date(notif.time).toLocaleTimeString()}</p>
+                                        <div key={notif.id} className="px-8 py-5 border-b border-white/5 hover:bg-white/[0.03] transition-colors group cursor-pointer">
+                                            <p className="text-[11px] font-black text-white group-hover:text-[#00FF41] transition-colors uppercase tracking-widest">{notif.title}</p>
+                                            <p className="text-[10px] text-white/40 mt-1 uppercase font-bold tracking-tight">{notif.message}</p>
+                                            <p className="text-[8px] text-white/10 mt-2 font-black italic">{new Date(notif.time).toLocaleTimeString()}</p>
                                         </div>
                                     ))
                                 )}
@@ -122,43 +102,35 @@ export default function AdminTopBar() {
                     </AnimatePresence>
                 </div>
 
-                <div className={`h-8 w-[1px] mx-2 ${isDarkMode ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+                <div className="h-6 w-[1px] bg-white/10 mx-2"></div>
 
                 {/* User Profile */}
                 <div className="relative group">
                     <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className={`flex items-center gap-2 p-1.5 rounded-full border transition-colors ${isDarkMode ? 'border-white/10 hover:border-[#d4af37]' : 'border-gray-200 hover:border-[#d4af37]'
-                            }`}
+                        whileHover={{ scale: 1.1 }}
+                        className="flex items-center gap-3 p-1 rounded-full border border-white/10 hover:border-[#d4af37] transition-all bg-white/5"
                     >
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-serif ${isDarkMode ? 'bg-[#d4af37]' : 'bg-[#001f3f]'}`}>
-                            <User className={`w-4 h-4 ${isDarkMode ? 'text-[#001f3f]' : 'text-white'}`} />
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center bg-[#d4af37] shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                            <User className="w-5 h-5 text-black" />
                         </div>
                     </motion.button>
 
-                    <div className="absolute right-0 rtl:left-0 rtl:right-auto pt-2 w-48 hidden group-hover:block z-50">
-                        <div className={`rounded-lg shadow-xl border py-1 ${isDarkMode ? 'bg-[#001f3f] border-[#d4af37]/30' : 'bg-white border-gray-100'}`}>
-                            <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-[#d4af37]/20 text-white' : 'border-gray-100'}`}>
-                                <p className="text-sm font-bold">Welcome back</p>
-                                <p className="text-xs text-gray-400">Admin</p>
+                    <div className="absolute right-0 rtl:left-0 rtl:right-auto pt-4 w-64 opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 pointer-events-none group-hover:pointer-events-auto z-50">
+                        <div className="bg-[#0a0a0a] border border-white/5 rounded-[2rem] shadow-2xl p-2">
+                            <div className="px-6 py-4 border-b border-white/5">
+                                <p className="text-[10px] font-black text-[#d4af37] uppercase tracking-[0.4em]">Administrator</p>
+                                <p className="text-[9px] text-white/20 font-black uppercase tracking-widest mt-1">LuxeShopy Core</p>
                             </div>
                             <button
                                 onClick={async () => {
-                                    const btn = document.getElementById('logout-btn') as HTMLButtonElement;
-                                    if (btn) {
-                                        btn.innerText = 'Logging out...';
-                                        btn.disabled = true;
-                                    }
                                     await adminLogout();
                                     localStorage.removeItem('supabase.auth.token');
                                     sessionStorage.clear();
                                     window.location.href = '/admin/login';
                                 }}
-                                id="logout-btn"
-                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full text-left px-6 py-4 text-[10px] font-black text-red-500 uppercase tracking-widest hover:bg-red-500/10 rounded-[1.5rem] flex items-center gap-3 transition-all"
                             >
-                                <LogOut className="w-4 h-4" /> Logout
+                                <LogOut className="w-4 h-4" /> Terminate Session
                             </button>
                         </div>
                     </div>

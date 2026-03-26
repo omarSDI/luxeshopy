@@ -17,72 +17,72 @@ interface SalesChartProps {
 export default function SalesChart({ data }: SalesChartProps) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-400 min-h-[350px] bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-100">
+      <div className="flex items-center justify-center h-full text-white/20 min-h-[350px] bg-white/5 rounded-[2rem] border-2 border-dashed border-white/10">
         <div className="text-center">
-          <p className="font-bold text-lg">Aucune donnée de vente</p>
-          <p className="text-sm">Les statistiques apparaîtront ici.</p>
+          <p className="font-black text-xs uppercase tracking-widest italic">No Telemetry</p>
+          <p className="text-[9px] uppercase tracking-[0.3em] mt-2">Awaiting Sales Synchronization</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-[400px] w-full mt-4">
+    <div className="h-full w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 20, right: 0, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#001f3f" stopOpacity={0.1} />
-              <stop offset="95%" stopColor="#001f3f" stopOpacity={0} />
+              <stop offset="5%" stopColor="#d4af37" stopOpacity={0.2} />
+              <stop offset="95%" stopColor="#d4af37" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid
-            strokeDasharray="8 8"
+            strokeDasharray="10 10"
             vertical={false}
-            stroke="#f1f5f9"
+            stroke="rgba(255,255,255,0.05)"
           />
           <XAxis
             dataKey="date"
-            stroke="#94a3b8"
-            fontSize={12}
-            fontWeight={700}
+            stroke="rgba(255,255,255,0.2)"
+            fontSize={9}
+            fontWeight={900}
             tickLine={false}
             axisLine={false}
             tick={{ dy: 15 }}
           />
           <YAxis
-            stroke="#94a3b8"
-            fontSize={12}
-            fontWeight={700}
+            stroke="rgba(255,255,255,0.2)"
+            fontSize={9}
+            fontWeight={900}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(value) => `${value}`}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#001f3f',
-              border: 'none',
-              borderRadius: '20px',
+              backgroundColor: '#0a0a0a',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '1.5rem',
               color: '#fff',
-              boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-              padding: '16px 20px'
+              boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+              padding: '20px',
+              fontFamily: 'Inter, sans-serif'
             }}
-            itemStyle={{ color: '#d4af37', fontWeight: 'bold', fontSize: '14px' }}
-            labelStyle={{ color: '#94a3b8', marginBottom: '8px', fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}
-            formatter={(value: number | undefined) => [
-              value !== undefined ? `${value.toFixed(2)} TND` : '0 TND',
-              'VENTES',
+            itemStyle={{ color: '#00FF41', fontWeight: '900', fontSize: '14px' }}
+            labelStyle={{ color: '#d4af37', marginBottom: '8px', fontSize: '10px', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.2em' }}
+            formatter={(value: any) => [
+              `${Number(value || 0).toFixed(0)} TND`,
+              'REVENUE SIGNAL',
             ]}
-            cursor={{ stroke: '#001f3f', strokeWidth: 2, strokeDasharray: '5 5' }}
+            cursor={{ stroke: '#d4af37', strokeWidth: 1, strokeDasharray: '4 4' }}
           />
           <Area
             type="monotone"
             dataKey="sales"
-            stroke="#001f3f"
-            strokeWidth={4}
+            stroke="#d4af37"
+            strokeWidth={3}
             fillOpacity={1}
             fill="url(#colorSales)"
-            animationDuration={1500}
+            animationDuration={2000}
           />
         </AreaChart>
       </ResponsiveContainer>
