@@ -247,11 +247,9 @@ export default function CheckoutForm() {
             <div key={item.lineId} className="flex justify-between gap-3 pb-4 border-b border-white/20">
               <div className="min-w-0 text-start">
                 <p className="font-semibold truncate">{item.name} × {item.quantity}</p>
-                {(item.size || item.color) && (
+                {item.options && Object.entries(item.options).length > 0 && (
                   <p className="text-sm text-white/70 mt-1">
-                    {item.size ? `${t('sizes')} ${item.size}` : ''}
-                    {item.size && item.color ? ' • ' : ''}
-                    {item.color ?? ''}
+                    {Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' • ')}
                   </p>
                 )}
               </div>

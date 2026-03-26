@@ -94,11 +94,9 @@ export default function CartSidebar() {
                         <div className="flex-1 min-w-0">
                           <h3 className="font-bold text-[#001f3f] truncate">{item.name}</h3>
                           <p className="text-[#d4af37] font-semibold text-sm mt-1">{item.price} TND</p>
-                          {(item.size || item.color) && (
+                          {item.options && Object.entries(item.options).length > 0 && (
                             <p className="text-gray-500 text-xs mt-1">
-                              {item.size ? `${t('sizes')} ${item.size}` : ''}
-                              {item.size && item.color ? ' • ' : ''}
-                              {item.color ? item.color : ''}
+                              {Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' • ')}
                             </p>
                           )}
 

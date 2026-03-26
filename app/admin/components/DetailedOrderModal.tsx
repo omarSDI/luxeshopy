@@ -151,9 +151,8 @@ export default function DetailedOrderModal({ isOpen, onClose, order }: DetailedO
                                                         <div className="min-w-0">
                                                             <p className="font-bold text-[#001f3f] truncate">{item.name}</p>
                                                             <p className="text-xs text-gray-500">
-                                                                {item.size ? `Size ${item.size}` : ''}
-                                                                {item.size && item.color ? ' | ' : ''}
-                                                                {item.color || ''}
+                                                                {item.options && Object.entries(item.options).length > 0 ? 
+                                                                    Object.entries(item.options).map(([k, v]) => `${k}: ${v}`).join(' | ') : ''}
                                                                 {` | ×${item.quantity}`}
                                                             </p>
                                                         </div>
