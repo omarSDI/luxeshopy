@@ -25,7 +25,6 @@ export default function ProductTable({ products }: ProductTableProps) {
       product.title.toLowerCase().includes(query) ||
       (product.description || '').toLowerCase().includes(query) ||
       (product.category || '').toLowerCase().includes(query) ||
-      (product.color || '').toLowerCase().includes(query) ||
       product.id.toLowerCase().includes(query)
     );
   });

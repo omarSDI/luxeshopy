@@ -93,24 +93,6 @@ export default function QuickViewModal({ product, onClose }: QuickViewModalProps
                     {product.description}
                   </p>
                 )}
-
-                {product.sizes && product.sizes.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-sm font-semibold text-[#001f3f] mb-2">
-                      {t('availableSizes')}:
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {product.sizes.map((size) => (
-                        <span
-                          key={size}
-                          className="px-4 py-2 border-2 border-[#d4af37]/30 rounded-lg text-sm font-medium text-[#001f3f] hover:border-[#d4af37] hover:bg-[#d4af37]/10 transition-colors cursor-pointer"
-                        >
-                          {size}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div className="flex gap-4 pt-4">

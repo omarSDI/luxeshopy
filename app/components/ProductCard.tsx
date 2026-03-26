@@ -119,9 +119,6 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
               >
                 {product.title}
               </h3>
-              {product.color && (
-                <p className="text-sm text-gray-600">{t('color')}: {product.color}</p>
-              )}
             </div>
 
             <div className="flex items-center justify-between">
@@ -129,12 +126,6 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
                 <p className="text-2xl font-bold text-[#d4af37] mb-1">
                   {product.price.toFixed(2)} TND
                 </p>
-                {product.sizes && product.sizes.length > 0 && (
-                  <p className="text-xs text-gray-500">
-                    {t('sizes')}: {product.sizes.slice(0, 3).join(', ')}
-                    {product.sizes.length > 3 && '...'}
-                  </p>
-                )}
               </div>
             </div>
 
