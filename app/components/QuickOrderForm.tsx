@@ -94,7 +94,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
 
         // CAPI Tracking
         trackServerEvent('Purchase', {
-          ph: phone.trim(), // simple hashing or hashing logic should be added for production
+          ph: phone.trim(), 
           fn: name.trim()
         }, {
           value: price,
@@ -110,22 +110,22 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
   };
 
   return (
-    <div className="bg-[#0a0a0a] rounded-[2rem] p-8 border border-white/10 shadow-2xl relative overflow-hidden group">
-      {/* Background Glow */}
-      <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#00FF41]/10 rounded-full blur-3xl group-hover:bg-[#00FF41]/20 transition-all duration-1000"></div>
+    <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border border-gray-100 shadow-xl relative overflow-hidden group">
+      {/* Subtle Background Glow */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#d4af37]/5 rounded-full blur-3xl group-hover:bg-[#d4af37]/10 transition-all duration-1000"></div>
 
-      <div className="relative z-10">
-        <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-[#00FF41]/20 rounded-xl flex items-center justify-center border border-[#00FF41]/30">
-                <Zap className="w-6 h-6 text-[#00FF41] animate-pulse" />
+      <div className="relative z-10 font-[Inter,sans-serif]">
+        <div className="flex items-center gap-4 mb-8">
+            <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100 shadow-inner">
+                <Zap className="w-7 h-7 text-[#d4af37] fill-[#d4af37]/20" />
             </div>
             <div>
-                <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter">COMMANDE RAPIDE</h3>
-                <p className="text-[#00FF41] text-[10px] font-bold tracking-[0.2em] uppercase">Paiement à la livraison</p>
+                <h3 className="text-xl sm:text-2xl font-black text-[#001f3f] italic uppercase tracking-tighter" style={{ fontFamily: 'Playfair Display, serif' }}>COMMANDE RAPIDE</h3>
+                <p className="text-[#d4af37] text-[10px] font-black tracking-[0.3em] uppercase">Paiement à la livraison</p>
             </div>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
            <div className="space-y-4">
                <div className="relative">
                    <input
@@ -133,7 +133,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
                        placeholder="Nom complet"
                        value={name}
                        onChange={(e) => setName(e.target.value)}
-                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-white/20 focus:border-[#00FF41]/50 focus:bg-white/10 outline-none transition-all"
+                       className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-semibold"
                        required
                    />
                </div>
@@ -143,20 +143,20 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
                        placeholder="Numéro de téléphone"
                        value={phone}
                        onChange={(e) => setPhone(e.target.value)}
-                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-white/20 focus:border-[#00FF41]/50 focus:bg-white/10 outline-none transition-all font-mono"
+                       className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-bold"
                        required
                    />
                </div>
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                    <select
                        value={governorate}
                        onChange={(e) => setGovernorate(e.target.value)}
-                       className="bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:border-[#00FF41]/50 focus:bg-white/10 outline-none transition-all appearance-none"
+                       className="bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] focus:border-[#d4af37] focus:bg-white outline-none transition-all appearance-none font-semibold"
                        required
                    >
-                       <option value="" disabled className="bg-black">Ville</option>
+                       <option value="" disabled className="bg-white">Ville</option>
                        {TUNISIAN_GOVERNORATES.map(gov => (
-                           <option key={gov} value={gov} className="bg-black text-white">{gov}</option>
+                           <option key={gov} value={gov} className="bg-white text-[#001f3f]">{gov}</option>
                        ))}
                    </select>
                    <input
@@ -164,7 +164,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
                        placeholder="Adresse"
                        value={city}
                        onChange={(e) => setCity(e.target.value)}
-                       className="bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white placeholder:text-white/20 focus:border-[#00FF41]/50 focus:bg-white/10 outline-none transition-all"
+                       className="bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-semibold"
                        required
                    />
                </div>
@@ -177,10 +177,10 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
            <button
              type="submit"
              disabled={isPending}
-             className="w-full py-5 bg-[#00FF41] text-black font-black text-lg rounded-2xl shadow-[0_0_30px_rgba(0,255,65,0.3)] hover:shadow-[0_0_50px_rgba(0,255,65,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex items-center justify-center gap-3 group/btn"
+             className="w-full py-5 bg-[#001f3f] text-white font-black text-lg rounded-[1.5rem] shadow-xl hover:bg-[#d4af37] hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 flex items-center justify-center gap-3 group/btn"
            >
              {isPending ? (
-               <div className="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+               <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
              ) : (
                <>
                  ACHETER MAINTENANT
@@ -189,13 +189,13 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
              )}
            </button>
 
-           <div className="grid grid-cols-2 gap-4 pt-4">
-                <div className="flex items-center gap-2 text-white/40 text-[10px] font-bold uppercase tracking-widest">
-                    <Truck className="w-4 h-4 text-[#00FF41]" />
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100 mt-4">
+                <div className="flex items-center gap-2 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
+                    <Truck className="w-4 h-4 text-[#d4af37]" />
                     Livraison Gratuite
                 </div>
-                <div className="flex items-center gap-2 text-white/40 text-[10px] font-bold uppercase tracking-widest">
-                    <ShieldCheck className="w-4 h-4 text-[#00FF41]" />
+                <div className="flex items-center gap-2 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
+                    <ShieldCheck className="w-4 h-4 text-[#d4af37]" />
                     Payer à la réception
                 </div>
            </div>

@@ -31,6 +31,12 @@ interface DashboardClientProps {
 export default function DashboardClient({ stats: initialStats, chartData: initialChartData, recentOrders: initialRecentOrders }: DashboardClientProps) {
     const { t } = useLanguage();
     const [orders, setOrders] = useState<Order[]>(initialRecentOrders);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+    
     
     // Analytics State
     const [timeFilter, setTimeFilter] = useState<'today' | 'week' | 'month'>('today');
@@ -98,7 +104,9 @@ export default function DashboardClient({ stats: initialStats, chartData: initia
                     <h1 className="text-4xl font-extrabold text-[#001f3f] tracking-tight uppercase" style={{ fontFamily: 'Playfair Display, serif' }}>
                         {t('welcomeBack')}, <span className="text-[#c5a059]">Admin</span>
                     </h1>
-                    <p className="text-gray-400 font-bold mt-1 uppercase tracking-widest text-[10px]">OPERATIONAL COMMAND CENTER • {new Date().toLocaleDateString()}</p>
+                    <p className="text-gray-400 font-bold mt-1 uppercase tracking-widest text-[10px]">
+                        OPERATIONAL COMMAND CENTER • {mounted ? new Date().toLocaleDateString() : '...'}
+                    </p>
                 </div>
                 
                 {/* Time Filter Toggle */}

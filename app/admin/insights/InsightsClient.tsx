@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useLanguage } from '@/app/context/LanguageContext';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -16,6 +16,11 @@ interface InsightsClientProps {
 
 export default function InsightsClient({ orders }: InsightsClientProps) {
     const { t, isRTL } = useLanguage();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // 1. Calculate KPIs with Synchronized Logic
     const derivedData = useMemo(() => {
@@ -128,49 +133,55 @@ export default function InsightsClient({ orders }: InsightsClientProps) {
                         {t('salesTrend')}
                     </h3>
                     <div className="h-[350px] w-full" dir="ltr">
-                        <ResponsiveContainer width="100%" height="100%" minHeight={350}>
-                            <AreaChart data={salesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#001f3f" stopOpacity={0.1} />
-                                        <stop offset="95%" stopColor="#001f3f" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis
-                                    dataKey="name"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
-                                />
-                                <YAxis
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
-                                />
-                                <Tooltip
-                                    contentStyle={{
-                                        borderRadius: '20px',
-                                        border: 'none',
-                                        boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
-                                        backgroundColor: '#001f3f',
-                                        color: '#fff',
-                                        padding: '16px'
-                                    }}
-                                    itemStyle={{ color: '#d4af37', fontWeight: 'bold' }}
-                                    labelStyle={{ color: '#94a3b8', fontWeight: 'bold', marginBottom: '4px' }}
-                                />
-                                <Area
-                                    type="monotone"
-                                    dataKey="revenue"
-                                    stroke="#001f3f"
-                                    fillOpacity={1}
-                                    fill="url(#colorPv)"
-                                    strokeWidth={4}
-                                    animationDuration={1500}
-                                />
-                            </AreaChart>
-                        </ResponsiveContainer>
+                        {!mounted ? (
+                            <div className="w-full h-full bg-gray-50 animate-pulse rounded-2xl flex items-center justify-center text-gray-300 font-bold">
+                                {t('loadingData')}...
+                            </div>
+                        ) : (
+                            <ResponsiveContainer width="100%" height="100%" minHeight={350}>
+                                <AreaChart data={salesData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                    <defs>
+                                        <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#001f3f" stopOpacity={0.1} />
+                                            <stop offset="95%" stopColor="#001f3f" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis
+                                        dataKey="name"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#94a3b8', fontSize: 12, fontWeight: 600 }}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            borderRadius: '20px',
+                                            border: 'none',
+                                            boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)',
+                                            backgroundColor: '#001f3f',
+                                            color: '#fff',
+                                            padding: '16px'
+                                        }}
+                                        itemStyle={{ color: '#d4af37', fontWeight: 'bold' }}
+                                        labelStyle={{ color: '#94a3b8', fontWeight: 'bold', marginBottom: '4px' }}
+                                    />
+                                    <Area
+                                        type="monotone"
+                                        dataKey="revenue"
+                                        stroke="#001f3f"
+                                        fillOpacity={1}
+                                        fill="url(#colorPv)"
+                                        strokeWidth={4}
+                                        animationDuration={1500}
+                                    />
+                                </AreaChart>
+                            </ResponsiveContainer>
+                        )}
                     </div>
                 </div>
 
@@ -183,33 +194,39 @@ export default function InsightsClient({ orders }: InsightsClientProps) {
                         {t('allOrders')}
                     </h3>
                     <div className="h-[350px] w-full" dir="ltr">
-                        <ResponsiveContainer width="100%" height="100%" minHeight={350}>
-                            <PieChart>
-                                <Pie
-                                    data={statusData}
-                                    cx="50%"
-                                    cy="45%"
-                                    innerRadius={70}
-                                    outerRadius={110}
-                                    paddingAngle={8}
-                                    dataKey="value"
-                                    animationDuration={1500}
-                                >
-                                    {statusData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
-                                    ))}
-                                </Pie>
-                                <Tooltip
-                                    contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-                                />
-                                <Legend
-                                    verticalAlign="bottom"
-                                    height={36}
-                                    iconType="circle"
-                                    formatter={(value) => <span className="text-gray-600 font-bold px-2">{value}</span>}
-                                />
-                            </PieChart>
-                        </ResponsiveContainer>
+                        {!mounted ? (
+                            <div className="w-full h-full bg-gray-50 animate-pulse rounded-2xl flex items-center justify-center text-gray-300 font-bold">
+                                {t('loadingData')}...
+                            </div>
+                        ) : (
+                            <ResponsiveContainer width="100%" height="100%" minHeight={350}>
+                                <PieChart>
+                                    <Pie
+                                        data={statusData}
+                                        cx="50%"
+                                        cy="45%"
+                                        innerRadius={70}
+                                        outerRadius={110}
+                                        paddingAngle={8}
+                                        dataKey="value"
+                                        animationDuration={1500}
+                                    >
+                                        {statusData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                                    />
+                                    <Legend
+                                        verticalAlign="bottom"
+                                        height={36}
+                                        iconType="circle"
+                                        formatter={(value) => <span className="text-gray-600 font-bold px-2">{value}</span>}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        )}
                     </div>
                 </div>
             </div>
