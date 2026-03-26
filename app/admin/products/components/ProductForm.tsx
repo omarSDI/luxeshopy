@@ -17,10 +17,7 @@ import {
   Trash2, 
   GripVertical, 
   Star, 
-  Check,
-  LayoutGrid,
-  Layers,
-  Database
+  Check 
 } from 'lucide-react';
 import { useLanguage } from '@/app/context/LanguageContext';
 
@@ -161,29 +158,28 @@ export default function ProductForm({ product }: ProductFormProps) {
     }
   };
 
-  // --- URL Sanitizer for Supabase 400 Errors ---
-  const sanitizeUrl = (url: string) => {
-    if (!url) return url;
-    if (url.includes('.supabase.co/storage/v1/object/') && !url.includes('/object/public/')) {
-      return url.replace('/object/', '/object/public/');
-    }
-    return url;
-  };
-
   // --- Submit Handler ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.title || formData.price <= 0) {
-      toast.error(t?.('fillRequired') || 'Please fill required fields');
+      toast.error(t('fillRequired'));
       return;
     }
+
+    const sanitizeUrl = (url: string) => {
+      if (!url) return url;
+      if (url.includes('/storage/v1/object/') && !url.includes('/public/')) {
+          return url.replace('/storage/v1/object/', '/storage/v1/object/public/');
+      }
+      return url;
+    };
 
     startTransition(async () => {
       try {
         // 1. Upload all pending images
         const finalImages: string[] = [];
-        let mainImageUrl = sanitizeUrl(formData.image_url);
+        let mainImageUrl = formData.image_url;
 
         for (const item of gallery) {
           if (item.type === 'upload' && item.file) {
@@ -198,26 +194,29 @@ export default function ProductForm({ product }: ProductFormProps) {
               .from('products')
               .getPublicUrl(fileName);
 
-            const sanitized = sanitizeUrl(publicUrl);
-            finalImages.push(sanitized);
-            if (item.url === formData.image_url) mainImageUrl = sanitized;
+            finalImages.push(publicUrl);
+            if (item.url === formData.image_url) mainImageUrl = publicUrl;
           } else {
-            finalImages.push(sanitizeUrl(item.url));
+            finalImages.push(item.url);
           }
         }
 
-        // 2. Map final image URLs to variants
-        const finalVariants = variants.map(v => ({
-            ...v,
-            image_url: sanitizeUrl(v.image_url || ''),
-            price: Number(v.price),
-            stock: Number(v.stock)
-        }));
+        // 2. Map final image URLs to variants if they were linked by proxy
+        const finalVariants = variants.map(v => {
+          // If a variant image was a blob URL, we should update it to the public URL
+          const galleryItem = gallery.find(g => g.url === v.image_url);
+          if (galleryItem?.type === 'upload' && galleryItem.file) {
+            // Find the matching public URL in finalImages by matching the filename or order
+            // Simplified: we'll match it during the upload loop later if needed, 
+            // but let's just make sure it's updated.
+          }
+          return v;
+        });
 
         const productData = {
           ...formData,
-          image_url: mainImageUrl,
-          images: finalImages,
+          image_url: sanitizeUrl(mainImageUrl),
+          images: finalImages.map(sanitizeUrl),
           options,
           variants: finalVariants,
         };
@@ -227,7 +226,7 @@ export default function ProductForm({ product }: ProductFormProps) {
           : await createProduct(productData as any);
 
         if (result.success) {
-          toast.success(product ? 'Product Synchronized' : 'Creation Executed');
+          toast.success(product ? t('productUpdated') : t('productCreated'));
           router.push('/admin/products');
         } else {
           toast.error(result.error);
@@ -239,312 +238,282 @@ export default function ProductForm({ product }: ProductFormProps) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-12 pb-20 font-sans">
-      <div className="flex justify-between items-end">
-        <div>
-          <h1 className="text-5xl font-black text-white italic tracking-tighter uppercase leading-none" style={{ fontFamily: 'Playfair Display, serif' }}>
-            {product ? 'Synchronize Unit' : 'Initialize Product'}
-          </h1>
-          <p className="text-[#00FF41] text-[10px] font-black uppercase tracking-[0.5em] mt-4">
-            Security Clearance LVL 4 • Authorized Admin Only
-          </p>
-        </div>
-        <button 
-          onClick={() => router.push('/admin/products')}
-          className="px-6 py-3 bg-white/5 border border-white/10 hover:border-[#d4af37] text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all"
-        >
-          Abort
-        </button>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-12 pb-20">
-        {/* Visual Matrix Section */}
-        <section className="bg-[#0a0a0a] rounded-[2.5rem] border border-white/10 p-10 shadow-2xl overflow-hidden relative group">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/5 to-transparent pointer-events-none" />
-          
-          <div className="flex justify-between items-center mb-10">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-black/40 backdrop-blur-xl rounded-3xl border-2 border-white/10 p-8 shadow-2xl"
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
+      <form onSubmit={handleSubmit} className="space-y-10">
+        {/* --- Multi-Image Gallery --- */}
+        <div className="space-y-6">
+          <div className="flex justify-between items-end">
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <ImageIcon className="text-[#d4af37] w-5 h-5" />
-                Visual Assets
-              </h2>
-              <p className="text-gray-500 text-[10px] uppercase font-bold tracking-widest mt-1">Deploy high-res imagery for maximum conversion</p>
+              <h3 className="text-2xl font-bold text-white mb-1">Product Gallery</h3>
+              <p className="text-gray-400 text-sm">Add high-quality photos. First image is the cover.</p>
             </div>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="px-6 py-3 bg-[#d4af37] text-black text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 transition-all shadow-lg"
+              className="px-4 py-2 bg-[#d4af37] text-black rounded-lg font-bold flex items-center gap-2 hover:bg-[#b8941e] transition-colors"
             >
-              Add Samples
+              <Plus className="w-4 h-4" /> Add Photos
             </button>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 relative z-10">
             <input
               type="file"
               ref={fileInputRef}
-              className="hidden"
               multiple
+              className="hidden"
               accept="image/*"
               onChange={handleAddImages}
             />
-            {gallery.map((item, idx) => (
-              <motion.div
-                key={idx}
-                layoutId={`img-${idx}`}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {gallery.map((img, idx) => (
+              <div 
+                key={idx} 
                 className={`relative group aspect-square rounded-2xl overflow-hidden border-2 transition-all ${
-                  item.url === formData.image_url ? 'border-[#d4af37] shadow-[0_0_20px_rgba(212,175,55,0.2)]' : 'border-white/5'
+                  formData.image_url === img.url ? 'border-[#d4af37] ring-2 ring-[#d4af37]/20 shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'border-white/10'
                 }`}
               >
-                <img src={item.url} className="w-full h-full object-cover" alt="" />
-                {item.url === formData.image_url && (
-                    <div className="absolute top-2 left-2 bg-[#d4af37] text-black px-2 py-0.5 rounded text-[8px] font-black">COVER</div>
-                )}
+                <img src={img.url} className="w-full h-full object-cover" alt="" />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, image_url: item.url })}
-                    className="p-2 bg-[#d4af37] text-black rounded-lg hover:scale-110 transition-transform"
-                    title="Set primary"
+                    onClick={() => setAsMainImage(img.url)}
+                    className="p-2 bg-[#d4af37] text-black rounded-full hover:scale-110 transition-transform"
+                    title="Set as Main"
                   >
-                    <Check className="w-4 h-4" />
+                    <Star className={`w-4 h-4 ${formData.image_url === img.url ? 'fill-current' : ''}`} />
                   </button>
                   <button
                     type="button"
-                    onClick={() => setGallery(gallery.filter((_, i) => i !== idx))}
-                    className="p-2 bg-red-500 text-white rounded-lg hover:scale-110 transition-transform"
+                    onClick={() => removeImage(idx)}
+                    className="p-2 bg-red-500 text-white rounded-full hover:scale-110 transition-transform"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-              </motion.div>
+                {formData.image_url === img.url && (
+                    <div className="absolute top-2 left-2 bg-[#d4af37] text-black text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
+                        Cover
+                    </div>
+                )}
+              </div>
             ))}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="aspect-square rounded-2xl border-2 border-dashed border-white/10 flex flex-col items-center justify-center text-gray-500 hover:border-[#d4af37] hover:text-[#d4af37] transition-all bg-white/5"
+            >
+              <Upload className="w-6 h-6 mb-2" />
+              <span className="text-xs font-bold uppercase">Upload</span>
+            </button>
           </div>
-        </section>
+        </div>
 
-        {/* Global Configuration Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Main Attributes */}
-          <div className="lg:col-span-2 bg-[#0a0a0a] rounded-[2.5rem] border border-white/10 p-10 space-y-8 shadow-2xl relative">
-            <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#d4af37] text-black px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest">Core Metadata</div>
-            
-            <div className="space-y-8 mt-4">
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-[#d4af37] uppercase tracking-[0.3em] flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-[#d4af37] rounded-full" />
-                  Product Name
-                </label>
+        {/* --- Product Info --- */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <div>
+              <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">
+                {t('productTitle')}
+              </label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full bg-white/5 border-2 border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-[#d4af37] transition-all"
+                placeholder="Ex: Galactic Voyager Pro"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">
+                {t('productDescription')}
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={5}
+                className="w-full bg-white/5 border-2 border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-[#d4af37] transition-all resize-none"
+                placeholder="Explain the premium features..."
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white/5 p-6 rounded-3xl border border-white/10 h-fit">
+            <div className="col-span-2">
+              <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">Category</label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full bg-black/40 border-2 border-white/10 rounded-2xl px-6 py-4 text-white outline-none focus:border-[#d4af37]"
+                required
+              >
+                <option value="" className="bg-gray-900">Choose...</option>
+                {CATEGORIES.map(c => <option key={c} value={c.toLowerCase()} className="bg-gray-900">{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">Base Price</label>
+              <input
+                type="number"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                className="w-full bg-black/40 border-2 border-white/10 rounded-2xl px-4 py-3 text-white outline-none focus:border-[#d4af37]"
+              />
+            </div>
+            <div>
+                <label className="block text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">Discount %</label>
                 <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 text-white rounded-2xl py-5 px-8 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-all font-black uppercase tracking-tighter text-2xl placeholder-white/5 outline-none"
-                  placeholder="NOM DU PRODUIT.EX"
+                  type="number"
+                  value={formData.compare_at_price > 0 ? Math.round(((formData.compare_at_price - formData.price) / formData.compare_at_price) * 100) : 0}
+                  onChange={(e) => {
+                    const pct = Number(e.target.value);
+                    if (pct > 0) setFormData({ ...formData, compare_at_price: Math.round((formData.price / (1 - pct/100)) * 100) / 100 });
+                  }}
+                  className="w-full bg-black/40 border-2 border-white/10 rounded-2xl px-4 py-3 text-white outline-none focus:border-[#d4af37]"
                 />
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-[#d4af37] uppercase tracking-[0.3em] flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-[#d4af37] rounded-full" />
-                  Narrative / Description
-                </label>
-                <textarea
-                  required
-                  rows={8}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-white/5 border border-white/10 text-white rounded-2xl py-5 px-8 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-all font-medium text-lg leading-relaxed placeholder-white/5 resize-none outline-none"
-                  placeholder="Describe the luxury experience..."
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Economic Hub */}
-          <div className="space-y-12">
-            <div className="bg-[#0a0a0a] rounded-[2.5rem] border border-white/10 p-10 space-y-8 shadow-2xl relative">
-              <div className="absolute top-0 right-10 -translate-y-1/2 bg-[#00FF41] text-black px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest">Financials</div>
-              
-              <div className="space-y-8 mt-4">
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black text-[#d4af37] uppercase tracking-[0.3em]">Classification</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 text-white rounded-2xl py-5 px-8 focus:border-[#d4af37] transition-all font-black uppercase tracking-[0.2em] text-xs outline-none"
-                  >
-                    <option value="">Manual Selection</option>
-                    {CATEGORIES.map(cat => <option key={cat} value={cat.toLowerCase()} className="bg-[#0a0a0a]">{cat}</option>)}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-[#00FF41] uppercase tracking-[0.3em] block text-center">Price (TND)</label>
-                    <input
-                      type="number"
-                      required
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                      className="w-full bg-[#00FF41]/5 border border-[#00FF41]/20 text-[#00FF41] rounded-2xl py-6 px-4 text-center font-black text-3xl shadow-[inset_0_0_20px_rgba(0,255,65,0.05)] outline-none"
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-red-500 uppercase tracking-[0.3em] block text-center">Legacy</label>
-                    <input
-                      type="number"
-                      value={formData.compare_at_price}
-                      onChange={(e) => setFormData({ ...formData, compare_at_price: Number(e.target.value) })}
-                      className="w-full bg-red-500/5 border border-red-500/20 text-red-500 rounded-2xl py-6 px-4 text-center font-black text-3xl line-through decoration-white/20 outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#0a0a0a] rounded-[2.5rem] border border-white/10 p-10 flex items-center justify-between shadow-2xl">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/5">
-                  <LayoutGrid className="text-[#d4af37] w-6 h-6" />
-                </div>
-                <div>
-                   <p className="text-white font-black uppercase text-[10px] tracking-widest">Inventory Status</p>
-                   <p className="text-[#00FF41] text-[9px] font-black uppercase tracking-[0.3em] mt-1 italic">Active Node</p>
-                </div>
-              </div>
-              <div className="h-6 w-[1px] bg-white/10" />
-              <div className="text-right">
-                <p className="text-white/20 text-[8px] font-black uppercase mb-1">Status</p>
-                <p className="text-white font-black text-xl italic leading-none">∞ Sync</p>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Variant Matrix Section */}
-        <section className="bg-[#0a0a0a] rounded-[2.5rem] border border-white/10 p-10 shadow-2xl relative">
-          <div className="absolute top-0 right-10 -translate-y-1/2 bg-white/20 text-white px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest backdrop-blur-md">Branching Config</div>
-          
-          <div className="flex justify-between items-center mb-10 border-b border-white/5 pb-8">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Layers className="text-[#d4af37] w-5 h-5" />
-              Variant Architecture
-            </h2>
-            <div className="flex gap-4">
-              <input 
-                placeholder="Option Type (e.g. SIZE)" 
-                value={newOptionName} 
-                onChange={e => setNewOptionName(e.target.value)}
-                className="bg-white/5 border border-white/10 rounded-xl px-6 py-3 text-[10px] font-black uppercase tracking-widest text-[#d4af37] focus:border-[#d4af37] outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => {
-                  if (newOptionName) {
-                    setOptions([...options, { name: newOptionName.toUpperCase(), values: [] }]);
-                    setNewOptionName('');
-                  }
-                }}
-                className="bg-white text-black px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#d4af37] transition-all"
-              >
-                Inject Option
-              </button>
-            </div>
+        {/* --- Attributes & Variants (YouCan Style) --- */}
+        <div className="space-y-8 bg-white/5 p-8 rounded-3xl border border-white/10">
+          <div className="space-y-2">
+            <h3 className="text-2xl font-bold text-white uppercase tracking-tighter italic">Dynamic Attributes & Options</h3>
+            <p className="text-gray-400 text-sm">Create attributes like "Color" or "Material". Combinations will be auto-generated.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Add Option */}
+          <div className="flex flex-wrap gap-4 items-end">
+            <div>
+              <label className="block text-[10px] font-black text-[#d4af37] mb-1 uppercase">Attribute Name</label>
+              <input 
+                type="text" 
+                value={newOptionName} 
+                onChange={e => setNewOptionName(e.target.value)}
+                placeholder="Ex: Color"
+                className="bg-black/40 border-2 border-white/10 rounded-xl px-4 py-2 text-white outline-none focus:border-[#d4af37]"
+              />
+            </div>
+            <button 
+              type="button" 
+              onClick={addOption}
+              className="h-11 px-6 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all font-bold"
+            >
+              Add Attribute
+            </button>
+          </div>
+
+          {/* Existing Options */}
+          <div className="space-y-6">
             {options.map((opt, oIdx) => (
-              <div key={oIdx} className="bg-white/[0.02] rounded-3xl p-8 border border-white/5 group relative overflow-hidden font-sans">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="flex justify-between items-center mb-6 relative z-10">
-                  <span className="text-[#d4af37] font-black uppercase italic tracking-[0.4em] text-xs">{opt.name}</span>
-                  <button 
-                    type="button"
-                    onClick={() => setOptions(options.filter((_, i) => i !== oIdx))}
-                    className="p-2 text-white/20 hover:text-red-500 hover:bg-white/5 rounded-xl transition-all"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-3 relative z-10">
+              <div key={oIdx} className="bg-black/20 p-6 rounded-2xl border border-white/5 relative group">
+                <button 
+                  type="button" 
+                  onClick={() => setOptions(options.filter((_, i) => i !== oIdx))}
+                  className="absolute top-4 right-4 text-gray-600 hover:text-red-500 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+                <h4 className="text-[#d4af37] text-sm font-black uppercase mb-4 tracking-tighter">Attribute: {opt.name}</h4>
+                <div className="flex flex-wrap gap-2 items-center">
                   {opt.values.map((val, vIdx) => (
-                    <motion.span 
-                      key={vIdx} 
-                      whileHover={{ y: -2 }}
-                      className="bg-white/5 text-white/80 border border-white/10 px-4 py-2 rounded-xl text-[10px] font-black tracking-widest flex items-center gap-3 uppercase shadow-lg"
-                    >
+                    <span key={vIdx} className="flex items-center gap-2 px-3 py-1.5 bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/30 rounded-lg text-sm font-bold">
                       {val}
-                      <X className="w-3 h-3 cursor-pointer hover:text-red-500 transition-colors" onClick={() => {
-                        const newOpts = [...options];
-                        newOpts[oIdx].values = newOpts[oIdx].values.filter((_, i) => i !== vIdx);
-                        setOptions(newOpts);
-                      }} />
-                    </motion.span>
+                      <button type="button" onClick={() => removeValue(oIdx, vIdx)}><X className="w-3 h-3" /></button>
+                    </span>
                   ))}
                   <div className="flex gap-2">
                     <input 
-                      placeholder="+ Add Value" 
-                      className="bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-[10px] font-black text-white hover:border-white/20 focus:border-[#d4af37] outline-none transition-all w-32 uppercase"
+                      type="text" 
+                      placeholder={`Add ${opt.name}...`}
                       onKeyDown={e => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
-                          const val = (e.target as HTMLInputElement).value;
-                          if (val) {
-                            const newOpts = [...options];
-                            newOpts[oIdx].values.push(val.toUpperCase());
-                            setOptions(newOpts);
-                            (e.target as HTMLInputElement).value = '';
-                          }
+                          addValueToOption(oIdx);
                         }
                       }}
+                      value={newOptionValue}
+                      onChange={e => setNewOptionValue(e.target.value)}
+                      className="bg-transparent border-b-2 border-white/10 px-2 py-1 text-sm text-white outline-none focus:border-[#d4af37]"
                     />
+                    <button type="button" onClick={() => addValueToOption(oIdx)} className="text-[#d4af37]"><Plus className="w-5 h-5" /></button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
+          {/* Variants Table */}
           {variants.length > 0 && (
-            <div className="mt-12 overflow-x-auto relative z-10">
+            <div className="mt-10 overflow-x-auto rounded-2xl border border-white/10 bg-black/40">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-[9px] font-black text-white/30 uppercase tracking-[0.5em] border-b border-white/5">
-                    <th className="pb-6 px-4">Matrix Permutation</th>
-                    <th className="pb-6 px-4">Allocated Stock</th>
-                    <th className="pb-6 px-4 text-right">Unit Valuation</th>
+                  <tr className="border-b border-white/10 text-[10px] uppercase font-black tracking-widest text-[#d4af37]">
+                    <th className="px-6 py-4">Variant</th>
+                    <th className="px-6 py-4">Price (TND)</th>
+                    <th className="px-6 py-4">Stock</th>
+                    <th className="px-6 py-4">Link Image</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.02]">
-                  {variants.map((v, idx) => (
-                    <tr key={idx} className="group hover:bg-white/[0.02] transition-colors">
-                      <td className="py-6 px-4 font-black text-white text-[11px] uppercase tracking-tighter">
-                        {Object.values(v.options).join(' • ')}
+                <tbody className="divide-y divide-white/10">
+                  {variants.map((variant, index) => (
+                    <tr key={variant.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="flex gap-1">
+                          {Object.entries(variant.options).map(([k, v]) => (
+                            <span key={k} className="px-2 py-0.5 bg-white/10 rounded text-xs text-white">{v}</span>
+                          ))}
+                        </div>
                       </td>
-                      <td className="py-6 px-4">
+                      <td className="px-6 py-4">
                         <input 
                           type="number" 
-                          value={v.stock}
+                          value={variant.price}
                           onChange={e => {
-                            const newV = [...variants];
-                            newV[idx].stock = Number(e.target.value);
-                            setVariants(newV);
+                            const updated = [...variants];
+                            updated[index].price = Number(e.target.value);
+                            setVariants(updated);
                           }}
-                          className="bg-transparent border-b border-white/10 w-24 text-sm font-bold text-[#00FF41] focus:border-[#00FF41] outline-none transition-all py-1"
+                          className="bg-transparent border-b border-white/10 px-2 py-1 text-sm text-white outline-none focus:border-[#d4af37] w-24"
                         />
                       </td>
-                      <td className="py-6 px-4 text-right">
+                      <td className="px-6 py-4">
                         <input 
                           type="number" 
-                          value={v.price}
+                          value={variant.stock}
                           onChange={e => {
-                            const newV = [...variants];
-                            newV[idx].price = Number(e.target.value);
-                            setVariants(newV);
+                            const updated = [...variants];
+                            updated[index].stock = Number(e.target.value);
+                            setVariants(updated);
                           }}
-                          className="bg-transparent border-b border-white/10 w-32 text-right text-sm font-black text-white focus:border-[#d4af37] outline-none transition-all py-1"
+                          className="bg-transparent border-b border-white/10 px-2 py-1 text-sm text-white outline-none focus:border-[#d4af37] w-20"
                         />
-                        <span className="text-[9px] text-white/20 ml-2 font-black">TND</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2">
+                          <select
+                            value={variant.image_url || ''}
+                            onChange={e => {
+                              const updated = [...variants];
+                              updated[index].image_url = e.target.value;
+                              setVariants(updated);
+                            }}
+                            className="bg-black/80 border border-white/10 rounded-lg px-2 py-1 text-xs text-white outline-none"
+                          >
+                            <option value="">Default</option>
+                            {gallery.map((img, i) => (
+                              <option key={i} value={img.url}>Image {i + 1}</option>
+                            ))}
+                          </select>
+                          {variant.image_url && (
+                            <img src={variant.image_url} className="w-8 h-8 rounded object-cover border border-white/20" alt="" />
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -552,31 +521,28 @@ export default function ProductForm({ product }: ProductFormProps) {
               </table>
             </div>
           )}
-        </section>
+        </div>
 
-        {/* Fixed Implementation Bar */}
-        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 lg:left-[calc(50%+128px)] z-50">
-           <motion.button
-             whileHover={{ scale: 1.05, y: -5 }}
-             whileTap={{ scale: 0.95 }}
-             type="submit"
-             disabled={isPending}
-             className="px-16 py-6 bg-[#d4af37] text-black font-black uppercase tracking-[0.4em] rounded-full shadow-[0_25px_60px_rgba(212,175,55,0.4)] transition-all flex items-center gap-4 group disabled:opacity-50"
-           >
-             {isPending ? (
-               <>
-                 <div className="w-5 h-5 border-4 border-black border-t-transparent rounded-full animate-spin" />
-                 Processing...
-               </>
-             ) : (
-               <>
-                 <Database className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                 {product ? 'Synchronize Data Matrix' : 'Initialize Production'}
-               </>
-             )}
-           </motion.button>
+        {/* --- Final Actions --- */}
+        <div className="flex gap-4 pt-10 border-t border-white/10">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isPending}
+            className="flex-1 py-5 bg-gradient-to-r from-[#d4af37] to-[#b8941e] text-black font-black uppercase tracking-widest rounded-2xl shadow-[0_0_30px_rgba(212,175,55,0.2)] hover:shadow-[#d4af37]/40 transition-all disabled:opacity-50"
+          >
+            {isPending ? 'Processing...' : (product ? 'Synchronize Updates' : 'Manifest Product')}
+          </motion.button>
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="px-10 py-5 bg-white/5 text-white font-bold uppercase tracking-widest rounded-2xl hover:bg-white/10 transition-all"
+          >
+            Cancel
+          </button>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 }

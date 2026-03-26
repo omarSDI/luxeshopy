@@ -61,128 +61,124 @@ export default function ProductTable({ products }: ProductTableProps) {
   }
 
   return (
-    <div className="bg-[#0a0a0a] rounded-[2rem] border border-white/10 shadow-3xl overflow-hidden relative">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/5 to-transparent pointer-events-none" />
-      
-      <div className="overflow-x-auto relative z-10">
-        <div className="p-8 border-b border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 bg-[#0a0a0a]/80 backdrop-blur-xl">
-          <div className="relative w-full max-w-xl">
+    <div className="bg-white rounded-2xl border-2 border-[#d4af37]/20 shadow-xl overflow-hidden">
+      <div className="overflow-x-auto">
+        <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-white sticky left-0">
+          <div className="relative w-full max-w-lg">
             <input
               type="text"
-              placeholder="Search product inventory..."
+              placeholder="Search for products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-14 pr-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/20 focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition-all font-bold uppercase tracking-widest text-[10px]"
+              className="w-full pl-10 pr-4 py-2 border border-[#d4af37]/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 transition-all font-medium text-[#001f3f]"
             />
-            <div className="absolute left-6 top-4 text-[#d4af37]">
+            <div className="absolute left-3 top-2.5 text-gray-400">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
           </div>
-          <div className="flex items-center gap-4">
-            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Filtered: {filteredProducts.length}</span>
-            <div className="h-4 w-[1px] bg-white/10" />
-            <Link 
-              href="/admin/products/new"
-              className="px-6 py-3 bg-[#00FF41] text-black text-[10px] font-black uppercase tracking-widest rounded-xl shadow-[0_0_20px_rgba(0,255,65,0.3)] hover:scale-105 transition-all"
-            >
-              Add Product
-            </Link>
-          </div>
+          <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors font-medium">
+            <span className="text-sm">Search filters</span>
+            <span className="bg-[#001f3f] text-[#d4af37] text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center">0</span>
+          </button>
         </div>
-
-        <table className="min-w-full">
-          <thead>
-            <tr className="border-b border-white/5 bg-white/[0.02]">
-              <th className="w-12 py-6 px-8">
-                <input type="checkbox" className="rounded bg-white/5 border-white/10 text-[#d4af37] focus:ring-[#d4af37]" />
+        <table className="min-w-full text-sm">
+          <thead className="bg-[#f8f9fa] border-b border-gray-200">
+            <tr>
+              <th className="w-12 py-4 px-6">
+                <input type="checkbox" className="rounded border-gray-300 text-[#001f3f] focus:ring-[#d4af37]" />
               </th>
-              <th className="text-left py-6 px-8 text-[10px] font-black text-[#d4af37] uppercase tracking-[0.4em]">
-                Identity & Visual
+              <th className="text-left py-4 px-6 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                Name
               </th>
-              <th className="text-left py-6 px-8 text-[10px] font-black text-[#d4af37] uppercase tracking-[0.4em]">
-                Valuation
+              <th className="text-left py-4 px-6 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                Price
               </th>
-              <th className="text-left py-6 px-8 text-[10px] font-black text-[#d4af37] uppercase tracking-[0.4em]">
-                Status
+              <th className="text-left py-4 px-6 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                Inventory
               </th>
-              <th className="text-left py-6 px-8 text-[10px] font-black text-[#d4af37] uppercase tracking-[0.4em]">
-                Matrix ID
+              <th className="text-left py-4 px-6 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                Orders
               </th>
-              <th className="text-right py-6 px-8 text-[10px] font-black text-[#d4af37] uppercase tracking-[0.4em]">
-                Management
+              <th className="text-left py-4 px-6 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                Visibility
+              </th>
+              <th className="text-left py-4 px-6 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                Creation date
+              </th>
+              <th className="text-left py-4 px-6 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5">
+          <tbody className="divide-y divide-gray-200">
             {filteredProducts.map((product, index) => (
               <motion.tr
                 key={product.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.03 }}
-                className="group hover:bg-white/[0.03] transition-all duration-300"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="hover:bg-[#d4af37]/5 transition-colors"
               >
-                <td className="py-6 px-8">
-                  <input type="checkbox" className="rounded bg-white/5 border-white/10 text-[#d4af37] focus:ring-[#d4af37]" />
+                <td className="py-4 px-6">
+                  <input type="checkbox" className="rounded border-gray-300 text-[#001f3f] focus:ring-[#d4af37]" />
                 </td>
-                <td className="py-6 px-8">
-                  <div className="flex items-center gap-6">
-                    <div className="w-14 h-14 relative rounded-2xl border border-white/10 overflow-hidden bg-white/5 group-hover:border-[#d4af37]/30 transition-all">
-                      <img
-                        src={product.image_url || ''}
-                        alt={product.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        onError={(e: any) => {
-                          e.currentTarget.src = 'https://images.unsplash.com/photo-1546868871-70c122467d9b?q=80&w=800';
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <div className="font-black text-white text-xs uppercase tracking-widest group-hover:text-[#d4af37] transition-colors">{product.title}</div>
-                      <div className="text-[9px] font-black text-white/30 uppercase tracking-widest mt-1">{product.category}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="py-6 px-8">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-black text-[#00FF41]">{product.price.toFixed(0)} TND</span>
-                    {product.compare_at_price && (
-                      <span className="text-[10px] text-white/20 line-through italic font-bold">{product.compare_at_price} TND</span>
+                <td className="py-4 px-6">
+                  <div className="flex items-center gap-4">
+                    {product.image_url ? (
+                      <div className="w-12 h-12 relative rounded border border-gray-200 overflow-hidden">
+                        <img
+                          src={product.image_url}
+                          alt={product.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">
+                        <Crown className="w-6 h-6 text-gray-300" />
+                      </div>
                     )}
+                    <div>
+                      <div className="font-semibold text-[#001f3f] hover:text-[#d4af37] cursor-pointer">{product.title}</div>
+                    </div>
                   </div>
                 </td>
-                <td className="py-6 px-8">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#00FF41]/10 text-[#00FF41] text-[9px] font-black uppercase tracking-widest rounded-full border border-[#00FF41]/20">
-                    <div className="w-1 h-1 bg-[#00FF41] rounded-full animate-pulse" />
-                    Operational
+                <td className="py-4 px-6 text-gray-900 font-medium">
+                  {product.price.toFixed(0)} TND
+                </td>
+                <td className="py-4 px-6 text-gray-500">
+                  Untracked
+                </td>
+                <td className="py-4 px-6 text-gray-500">
+                  0
+                </td>
+                <td className="py-4 px-6">
+                  <span className="inline-flex rounded bg-green-100 text-green-700 px-3 py-1 text-xs font-semibold">
+                    Visible
                   </span>
                 </td>
-                <td className="py-6 px-8">
-                   <span className="text-[9px] font-mono text-white/20 uppercase tracking-tighter truncate max-w-[100px] block">
-                     {product.id}
-                   </span>
+                <td className="py-4 px-6 text-gray-500 text-sm">
+                  {new Date().toLocaleDateString()}
                 </td>
-                <td className="py-6 px-8 text-right">
-                  <div className="flex items-center justify-end gap-3">
-                    <Link
-                      href={`/products/${product.id}`}
-                      target="_blank"
-                      className="p-2.5 text-white/20 hover:text-[#d4af37] hover:bg-white/5 rounded-xl transition-all"
-                    >
+                <td className="py-4 px-6">
+                  <div className="flex items-center gap-2">
+                    <button className="p-2 text-gray-400 hover:text-[#001f3f] rounded-full hover:bg-gray-100 transition-colors">
                       <Eye className="w-4 h-4" />
-                    </Link>
+                    </button>
                     <Link
                       href={`/admin/products/${product.id}/edit`}
-                      className="p-2.5 text-white/20 hover:text-[#00FF41] hover:bg-white/5 rounded-xl transition-all"
+                      className="p-2 text-gray-400 hover:text-[#001f3f] rounded-full hover:bg-gray-100 transition-colors"
                     >
                       <Edit className="w-4 h-4" />
                     </Link>
                     <button
                       onClick={() => handleDelete(product.id, product.title)}
                       disabled={deletingId === product.id || isPending}
-                      className="p-2.5 text-white/20 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                      className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
+                    </button>
+                    <button className="p-2 text-gray-400 hover:text-[#001f3f] rounded-full hover:bg-gray-100 transition-colors">
+                      <Copy className="w-4 h-4" />
                     </button>
                   </div>
                 </td>
