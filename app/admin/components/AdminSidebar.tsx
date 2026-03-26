@@ -41,6 +41,7 @@ export default function AdminSidebar() {
     { href: '/admin/insights', label: t('insights'), icon: BarChart3 },
     { href: '/admin/invoices', label: t('invoices'), icon: FileText },
     { href: '/admin/marketing', label: 'Marketing', icon: Share2 },
+    { href: '/admin/messages', label: 'Messages', icon: Headphones },
     { href: '/admin/settings', label: t('settings'), icon: Settings },
   ];
 

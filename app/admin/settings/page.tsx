@@ -1,30 +1,21 @@
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { ADMIN_COOKIE_NAME, isValidAdminToken } from '@/lib/constants';
-import SettingsForm from './components/SettingsForm';
+import { getShippingFee } from '@/app/actions/settings';
+import SettingsClient from '@/app/admin/settings/SettingsClient';
 
-export default async function AdminSettingsPage() {
-  const jar = await cookies();
-  const token = jar.get(ADMIN_COOKIE_NAME)?.value;
+export const dynamic = 'force-dynamic';
 
-  if (!isValidAdminToken(token)) {
-    redirect('/admin/login');
-  }
+export default async function SettingsPage() {
+    const shippingFee = await getShippingFee();
 
-  return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#001f3f] to-[#001f3f] rounded-2xl p-8 text-white shadow-xl">
-        <h1
-          className="text-4xl md:text-5xl font-bold mb-2"
-          style={{ fontFamily: 'Playfair Display, serif' }}
-        >
-          Settings
-        </h1>
-        <p className="text-white/80 text-lg">Manage your admin account and preferences</p>
-      </div>
+    return (
+        <div className="max-w-4xl mx-auto space-y-10 py-8 animate-fade-in">
+            <div>
+                <h1 className="text-4xl font-extrabold text-[#001f3f] tracking-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    Store Settings
+                </h1>
+                <p className="text-gray-500 mt-2 font-medium">Configure global parameters for your LuxeShopy experience.</p>
+            </div>
 
-      <SettingsForm />
-    </div>
-  );
+            <SettingsClient initialShippingFee={shippingFee} />
+        </div>
+    );
 }

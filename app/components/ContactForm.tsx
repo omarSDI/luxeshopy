@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { submitContactForm } from '../actions/contact';
+import { createMessage } from '../actions/messages';
 import { useLanguage } from '../context/LanguageContext';
 import { toast } from 'sonner';
 
@@ -21,7 +21,7 @@ export default function ContactForm() {
             message: formData.get('message') as string,
         };
 
-        const result = await submitContactForm(data);
+        const result = await createMessage(data);
 
         if (result.success) {
             toast.success(t('success'));

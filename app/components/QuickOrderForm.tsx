@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Truck, ShieldCheck, Zap } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { createOrder } from '@/app/actions/orders';
+import { getShippingFee } from '@/app/actions/settings';
 import { trackServerEvent } from '@/app/actions/capi';
 import * as fbpixel from '@/lib/fpixel';
 
@@ -19,6 +20,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [shippingConfig, setShippingConfig] = useState({ amount: 7, free_threshold: 0 });
   
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -26,7 +28,19 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
   const [governorate, setGovernorate] = useState('');
   const [hasStarted, setHasStarted] = useState(false);
 
-  const price = variant?.price || product.price;
+  const productPrice = variant?.price || product.price;
+
+  useEffect(() => {
+    const fetchShipping = async () => {
+        const config = await getShippingFee();
+        if (config) setShippingConfig(config);
+    };
+    fetchShipping();
+  }, []);
+
+  const isFreeShipping = shippingConfig.free_threshold > 0 && productPrice >= shippingConfig.free_threshold;
+  const currentShippingFee = isFreeShipping ? 0 : shippingConfig.amount;
+  const totalPrice = productPrice + currentShippingFee;
 
   const TUNISIAN_GOVERNORATES = [
     'Ariana', 'Béja', 'Ben Arous', 'Bizerte', 'Gabès', 'Gafsa', 'Jendouba',
@@ -43,17 +57,17 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
         content_name: product.title,
         content_ids: [product.id],
         content_type: 'product',
-        value: price,
+        value: totalPrice,
         currency: 'TND'
       });
       // Server-side CAPI
       trackServerEvent('InitiateCheckout', {}, {
         content_name: product.title,
-        value: price,
+        value: totalPrice,
         currency: 'TND'
       });
     }
-  }, [name, phone, city, hasStarted, product, price]);
+  }, [name, phone, city, hasStarted, product, totalPrice]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,11 +83,11 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
         customer_name: name.trim(),
         phone: phone.trim(),
         address: `${city.trim()}, ${governorate}`,
-        total_price: price,
+        total_price: totalPrice,
         items: [{
           id: product.id,
           name: product.title,
-          price: price,
+          price: productPrice,
           quantity: 1,
           variantId: variant?.id,
           options: variant?.options,
@@ -86,7 +100,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
       if (res.success) {
         // Pixel Tracking
         fbpixel.event('Purchase', {
-          value: price,
+          value: totalPrice,
           currency: 'TND',
           content_name: product.title,
           content_ids: [product.id]
@@ -97,7 +111,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
           ph: phone.trim(), 
           fn: name.trim()
         }, {
-          value: price,
+          value: totalPrice,
           currency: 'TND',
           content_name: product.title
         });
@@ -131,26 +145,22 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
 
         <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
            <div className="space-y-4">
-               <div className="relative">
-                   <input
-                       type="text"
-                       placeholder={t('fullName')}
-                       value={name}
-                       onChange={(e) => setName(e.target.value)}
-                       className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-semibold"
-                       required
-                   />
-               </div>
-               <div className="relative">
-                   <input
-                       type="tel"
-                       placeholder={t('phoneNumber')}
-                       value={phone}
-                       onChange={(e) => setPhone(e.target.value)}
-                       className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-bold"
-                       required
-                   />
-               </div>
+               <input
+                   type="text"
+                   placeholder={t('fullName')}
+                   value={name}
+                   onChange={(e) => setName(e.target.value)}
+                   className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-semibold"
+                   required
+               />
+               <input
+                   type="tel"
+                   placeholder={t('phoneNumber')}
+                   value={phone}
+                   onChange={(e) => setPhone(e.target.value)}
+                   className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-bold"
+                   required
+               />
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                    <select
                        value={governorate}
@@ -172,6 +182,26 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
                        required
                    />
                </div>
+           </div>
+
+           {/* Pricing Row */}
+           <div className="bg-gray-50/50 p-4 rounded-2xl border border-gray-100 space-y-2 mb-4">
+                <div className="flex justify-between items-center text-xs font-bold text-gray-500 uppercase tracking-widest">
+                    <span>{t('total')}</span>
+                    <span>{productPrice.toFixed(2)} TND</span>
+                </div>
+                <div className="flex justify-between items-center text-xs font-bold text-gray-500 uppercase tracking-widest">
+                    <span className="flex items-center gap-2"><Truck className="w-3.5 h-3.5"/> Delivery</span>
+                    {isFreeShipping ? (
+                        <span className="text-emerald-500">{t('freeDelivery')}</span>
+                    ) : (
+                        <span>{shippingConfig.amount.toFixed(2)} TND</span>
+                    )}
+                </div>
+                <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+                    <span className="text-xl font-black text-[#001f3f]">{totalPrice.toFixed(2)} TND</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase">{t('taxesIncluded')}</span>
+                </div>
            </div>
 
            {error && (

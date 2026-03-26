@@ -1,14 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, Plus, Minus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { X, Plus, Minus, Trash2, ShoppingBag, ArrowLeft, Truck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '../store/cartStore';
 import { useLanguage } from '../context/LanguageContext';
+import { getShippingFee } from '@/app/actions/settings';
 import Link from 'next/link';
 
 export default function CartSidebar() {
   const [mounted, setMounted] = useState(false);
+  const [shippingConfig, setShippingConfig] = useState({ amount: 7, free_threshold: 0 });
   const {
     items,
     isOpen,
@@ -21,9 +23,19 @@ export default function CartSidebar() {
 
   useEffect(() => {
     setMounted(true);
+    const fetchShipping = async () => {
+      const config = await getShippingFee();
+      if (config) setShippingConfig(config);
+    };
+    fetchShipping();
   }, []);
 
   if (!mounted) return null;
+
+  const subtotal = getTotalPrice();
+  const isFreeShipping = shippingConfig.free_threshold > 0 && subtotal >= shippingConfig.free_threshold;
+  const currentShippingFee = isFreeShipping ? 0 : shippingConfig.amount;
+  const finalTotal = subtotal + currentShippingFee;
 
   return (
     <AnimatePresence>
@@ -38,7 +50,7 @@ export default function CartSidebar() {
             onClick={closeCart}
           />
 
-          {/* Sidebar — slides from right in LTR, from left in RTL */}
+          {/* Sidebar */}
           <motion.div
             initial={{ x: isRTL ? '-100%' : '100%' }}
             animate={{ x: 0 }}
@@ -64,11 +76,7 @@ export default function CartSidebar() {
               <button
                 onClick={closeCart}
                 className="group flex items-center gap-2 p-2 px-3 bg-gray-50 hover:bg-[#001f3f] text-[#001f3f] hover:text-white rounded-2xl transition-all duration-300 border border-gray-100"
-                aria-label="Close cart"
               >
-                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">
-                    {t('close')}
-                </span>
                 <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
               </button>
             </div>
@@ -81,132 +89,65 @@ export default function CartSidebar() {
                     <ShoppingBag className="w-10 h-10 text-gray-200" />
                   </div>
                   <h3 className="text-xl font-bold text-[#001f3f] mb-2">{t('cartEmpty')}</h3>
-                  <p className="text-gray-400 text-sm mb-8 max-w-[200px]">{t('cartEmptySub')}</p>
-                  <button 
-                    onClick={closeCart}
-                    className="px-8 py-3 bg-[#001f3f] text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#d4af37] transition-colors"
-                  >
+                  <button onClick={closeCart} className="px-8 py-3 bg-[#001f3f] text-white rounded-xl font-bold">
                     {t('exploreCollection')}
                   </button>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {items.map((item, index) => (
-                    <motion.div
-                      key={item.lineId}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="group flex gap-4 p-4 bg-white border border-gray-100 rounded-[2rem] hover:border-[#d4af37]/30 transition-all shadow-sm hover:shadow-xl hover:shadow-[#d4af37]/5"
-                    >
-                      {/* Product Image */}
-                      <div className="w-24 h-24 sm:w-28 sm:h-28 bg-gray-50 rounded-3xl flex-shrink-0 overflow-hidden border border-gray-50">
-                        {item.image_url ? (
-                          <img 
-                            src={item.image_url} 
-                            alt={item.name} 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-                            <ShoppingBag className="w-8 h-8 text-gray-200" />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Product Info */}
-                      <div className="flex-1 flex flex-col justify-between py-1">
-                        <div>
-                          <div className="flex justify-between gap-2">
-                             <h3 className="font-black text-[#001f3f] text-sm sm:text-base leading-tight uppercase line-clamp-2">{item.name}</h3>
-                             <button
-                                onClick={() => removeItem(item.lineId)}
-                                className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                             >
-                               <Trash2 className="w-4 h-4" />
-                             </button>
-                          </div>
-                          {item.options && Object.entries(item.options).length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {Object.entries(item.options).map(([k, v]) => (
-                                <span key={k} className="text-[9px] font-black bg-gray-50 text-[#001f3f]/60 px-2 py-1 rounded-md border border-gray-100 uppercase tracking-tighter">
-                                  {v}
-                                </span>
-                              ))}
+                items.map((item) => (
+                    <div key={item.lineId} className="flex gap-4 p-4 bg-white border border-gray-50 rounded-[1.5rem] shadow-sm">
+                        <div className="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0">
+                            <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1">
+                            <h4 className="font-bold text-[#001f3f] text-sm line-clamp-1">{item.name}</h4>
+                            <div className="flex items-center justify-between mt-4">
+                                <div className="flex items-center gap-3 bg-gray-50 px-2 py-1 rounded-lg">
+                                    <button onClick={() => updateQuantity(item.lineId, Math.max(1, item.quantity - 1))}><Minus className="w-3 h-3"/></button>
+                                    <span className="text-xs font-bold">{item.quantity}</span>
+                                    <button onClick={() => updateQuantity(item.lineId, item.quantity + 1)}><Plus className="w-3 h-3"/></button>
+                                </div>
+                                <span className="font-black text-[#d4af37]">{(item.price * item.quantity).toFixed(2)} TND</span>
                             </div>
-                          )}
                         </div>
-
-                        <div className="flex items-center justify-between mt-4">
-                           {/* Quantity */}
-                           <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-gray-100">
-                              <button
-                                onClick={() => updateQuantity(item.lineId, Math.max(1, item.quantity - 1))}
-                                className="w-8 h-8 flex items-center justify-center text-[#001f3f] hover:bg-white rounded-lg transition-all shadow-sm active:scale-90"
-                              >
-                                <Minus className="w-3 h-3" />
-                              </button>
-                              <span className="text-xs font-black text-[#001f3f] w-8 text-center">{item.quantity}</span>
-                              <button
-                                onClick={() => updateQuantity(item.lineId, item.quantity + 1)}
-                                className="w-8 h-8 flex items-center justify-center text-[#001f3f] hover:bg-white rounded-lg transition-all shadow-sm active:scale-90"
-                              >
-                                <Plus className="w-3 h-3" />
-                              </button>
-                           </div>
-                           <p className="text-[#d4af37] font-black text-sm sm:text-lg">
-                             {(item.price * item.quantity).toFixed(2)} TND
-                           </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+                    </div>
+                ))
               )}
             </div>
 
             {/* Footer */}
             {items.length > 0 && (
-              <div className="p-6 sm:p-8 bg-white border-t border-gray-100 shadow-[0_-20px_40px_rgba(0,0,0,0.02)]">
-                <div className="flex justify-between items-center mb-6">
-                  <div>
-                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('total')}</p>
-                     <p className="text-3xl font-black text-[#001f3f] tracking-tighter">
-                       {getTotalPrice().toFixed(2)} <span className="text-lg text-[#d4af37]">TND</span>
-                     </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">
-                        {t('freeDelivery')}
-                    </p>
-                    <p className="text-[10px] font-bold text-gray-400">
-                        {t('taxesIncluded')}
-                    </p>
-                  </div>
+              <div className="p-6 sm:p-8 bg-gray-50 border-t border-gray-100">
+                <div className="space-y-4 mb-6">
+                    <div className="flex justify-between text-sm font-bold text-gray-500">
+                        <span>{t('total')}</span>
+                        <span>{subtotal.toFixed(2)} TND</span>
+                    </div>
+                    <div className="flex justify-between text-sm font-bold">
+                        <span className="flex items-center gap-2"><Truck className="w-4 h-4"/> Delivery</span>
+                        {isFreeShipping ? (
+                            <span className="text-emerald-500">{t('freeDelivery')}</span>
+                        ) : (
+                            <span>{shippingConfig.amount.toFixed(2)} TND</span>
+                        )}
+                    </div>
+                    <div className="flex justify-between items-end pt-2 border-t border-gray-200">
+                        <p className="text-3xl font-black text-[#001f3f]">{finalTotal.toFixed(2)} <span className="text-sm font-bold text-[#d4af37]">TND</span></p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">{t('taxesIncluded')}</p>
+                    </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3">
-                  <Link
-                    href="/checkout"
-                    onClick={closeCart}
-                    className="w-full py-5 bg-[#001f3f] text-white font-black rounded-2xl flex items-center justify-center gap-3 shadow-xl shadow-[#001f3f]/20 hover:bg-[#d4af37] hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 uppercase tracking-widest text-sm"
-                  >
-                    {t('proceedCheckout')}
-                    <motion.div
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ repeat: Infinity, duration: 1.5 }}
-                    >
-                      <Plus className="w-4 h-4 rotate-45" />
-                    </motion.div>
-                  </Link>
-                  <button
-                    onClick={closeCart}
-                    className="w-full py-4 text-gray-400 font-bold hover:text-[#001f3f] transition-colors uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-2"
-                  >
+                <Link
+                  href="/checkout"
+                  onClick={closeCart}
+                  className="w-full py-5 bg-[#001f3f] text-white font-black rounded-2xl flex items-center justify-center gap-3 shadow-xl hover:bg-[#d4af37] transition-all uppercase tracking-widest text-sm"
+                >
+                  {t('proceedCheckout')}
+                </Link>
+                <button onClick={closeCart} className="w-full py-4 text-gray-400 font-bold uppercase text-[10px] flex items-center justify-center gap-2 mt-2">
                     <ArrowLeft className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
                     {t('backToCollection')}
-                  </button>
-                </div>
+                </button>
               </div>
             )}
           </motion.div>
