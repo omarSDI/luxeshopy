@@ -29,13 +29,11 @@ export default function ShopClient({ products }: ShopClientProps) {
                 const title = (p.title || '').toLowerCase();
                 const description = (p.description || '').toLowerCase();
                 const category = (p.category || '').toLowerCase();
-                const color = (p.color || '').toLowerCase();
                 const id = String(p.id || '').toLowerCase();
 
                 return title.includes(query) ||
                     description.includes(query) ||
                     category.includes(query) ||
-                    color.includes(query) ||
                     id.includes(query);
             });
         }
@@ -64,7 +62,6 @@ export default function ShopClient({ products }: ShopClientProps) {
             const matchesSearch = (p.title || '').toLowerCase().includes(query) ||
                 (p.description || '').toLowerCase().includes(query) ||
                 (p.category || '').toLowerCase().includes(query) ||
-                (p.color || '').toLowerCase().includes(query) ||
                 String(p.id || '').toLowerCase().includes(query);
             return matchesSearch && p.category?.toLowerCase() !== t(selectedCategory).toLowerCase() && p.category?.toLowerCase() !== selectedCategory;
         }).length;
