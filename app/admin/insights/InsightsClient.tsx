@@ -132,7 +132,7 @@ export default function InsightsClient({ orders }: InsightsClientProps) {
                     >
                         {t('salesTrend')}
                     </h3>
-                    <div className="h-[350px] w-full" dir="ltr">
+                    <div className="h-[350px] w-full min-h-[350px]" dir="ltr">
                         {!mounted ? (
                             <div className="w-full h-full bg-gray-50 animate-pulse rounded-2xl flex items-center justify-center text-gray-300 font-bold">
                                 {t('loadingData')}...
@@ -193,7 +193,7 @@ export default function InsightsClient({ orders }: InsightsClientProps) {
                     >
                         {t('allOrders')}
                     </h3>
-                    <div className="h-[350px] w-full" dir="ltr">
+                    <div className="h-[350px] w-full min-h-[350px]" dir="ltr">
                         {!mounted ? (
                             <div className="w-full h-full bg-gray-50 animate-pulse rounded-2xl flex items-center justify-center text-gray-300 font-bold">
                                 {t('loadingData')}...

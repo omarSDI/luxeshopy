@@ -15,7 +15,7 @@ interface QuickOrderFormProps {
 }
 
 export default function QuickOrderForm({ product, variant }: QuickOrderFormProps) {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +60,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
     setError(null);
 
     if (phone.length < 8) {
-      setError('Veuillez entrer un numéro de téléphone valide.');
+      setError(t('invalidPhone'));
       return;
     }
 
@@ -104,7 +104,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
 
         router.push(`/checkout/success?orderId=${res.data?.orderId}`);
       } else {
-        setError('Une erreur est survenue. Veuillez réessayer.');
+        setError(t('orderError'));
       }
     });
   };
@@ -114,14 +114,18 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
       {/* Subtle Background Glow */}
       <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#d4af37]/5 rounded-full blur-3xl group-hover:bg-[#d4af37]/10 transition-all duration-1000"></div>
 
-      <div className="relative z-10 font-[Inter,sans-serif]">
+      <div className="relative z-10 font-[Inter,sans-serif]" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="flex items-center gap-4 mb-8">
             <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100 shadow-inner">
                 <Zap className="w-7 h-7 text-[#d4af37] fill-[#d4af37]/20" />
             </div>
             <div>
-                <h3 className="text-xl sm:text-2xl font-black text-[#001f3f] italic uppercase tracking-tighter" style={{ fontFamily: 'Playfair Display, serif' }}>COMMANDE RAPIDE</h3>
-                <p className="text-[#d4af37] text-[10px] font-black tracking-[0.3em] uppercase">Paiement à la livraison</p>
+                <h3 className="text-xl sm:text-2xl font-black text-[#001f3f] italic uppercase tracking-tighter" style={{ fontFamily: 'Playfair Display, serif' }}>
+                    {t('quickOrderTitle')}
+                </h3>
+                <p className="text-[#d4af37] text-[10px] font-black tracking-[0.3em] uppercase">
+                    {t('paymentOnDelivery')}
+                </p>
             </div>
         </div>
 
@@ -130,7 +134,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
                <div className="relative">
                    <input
                        type="text"
-                       placeholder="Nom complet"
+                       placeholder={t('fullName')}
                        value={name}
                        onChange={(e) => setName(e.target.value)}
                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-semibold"
@@ -140,7 +144,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
                <div className="relative">
                    <input
                        type="tel"
-                       placeholder="Numéro de téléphone"
+                       placeholder={t('phoneNumber')}
                        value={phone}
                        onChange={(e) => setPhone(e.target.value)}
                        className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-bold"
@@ -154,14 +158,14 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
                        className="bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] focus:border-[#d4af37] focus:bg-white outline-none transition-all appearance-none font-semibold"
                        required
                    >
-                       <option value="" disabled className="bg-white">Ville</option>
+                       <option value="" disabled className="bg-white">{t('governorate')}</option>
                        {TUNISIAN_GOVERNORATES.map(gov => (
                            <option key={gov} value={gov} className="bg-white text-[#001f3f]">{gov}</option>
                        ))}
                    </select>
                    <input
                        type="text"
-                       placeholder="Adresse"
+                       placeholder={t('city')}
                        value={city}
                        onChange={(e) => setCity(e.target.value)}
                        className="bg-gray-50 border border-gray-200 rounded-2xl px-5 py-4 text-[#001f3f] placeholder:text-gray-400 focus:border-[#d4af37] focus:bg-white focus:ring-4 focus:ring-[#d4af37]/5 outline-none transition-all font-semibold"
@@ -183,7 +187,7 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
                <div className="w-6 h-6 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
              ) : (
                <>
-                 ACHETER MAINTENANT
+                 <span className="uppercase">{t('buyNow')}</span>
                  <CheckCircle className="w-6 h-6 group-hover/btn:rotate-12 transition-transform" />
                </>
              )}
@@ -192,11 +196,11 @@ export default function QuickOrderForm({ product, variant }: QuickOrderFormProps
            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100 mt-4">
                 <div className="flex items-center gap-2 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
                     <Truck className="w-4 h-4 text-[#d4af37]" />
-                    Livraison Gratuite
+                    {t('freeDeliveryLabel')}
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] leading-none">
                     <ShieldCheck className="w-4 h-4 text-[#d4af37]" />
-                    Payer à la réception
+                    {t('payAtReceiptLabel')}
                 </div>
            </div>
         </form>

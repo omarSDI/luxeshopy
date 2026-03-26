@@ -17,7 +17,7 @@ export default function CartSidebar() {
     removeItem,
     getTotalPrice,
   } = useCartStore();
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, dir } = useLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -28,7 +28,7 @@ export default function CartSidebar() {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[100] overflow-hidden">
+        <div className="fixed inset-0 z-[100] overflow-hidden" dir={dir}>
           {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -57,16 +57,18 @@ export default function CartSidebar() {
                     {t('shoppingCart')}
                   </h2>
                   <p className="text-[10px] text-[#d4af37] font-bold tracking-widest uppercase">
-                    {items.length} {items.length === 1 ? 'Article' : 'Articles'}
+                    {items.length} {items.length === 1 ? t('cartItem') : t('cartItems')}
                   </p>
                 </div>
               </div>
               <button
                 onClick={closeCart}
                 className="group flex items-center gap-2 p-2 px-3 bg-gray-50 hover:bg-[#001f3f] text-[#001f3f] hover:text-white rounded-2xl transition-all duration-300 border border-gray-100"
-                aria-label="Continue shopping"
+                aria-label="Close cart"
               >
-                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">Fermer</span>
+                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">
+                    {t('close')}
+                </span>
                 <X className="w-5 h-5 group-hover:rotate-90 transition-transform" />
               </button>
             </div>
@@ -84,7 +86,7 @@ export default function CartSidebar() {
                     onClick={closeCart}
                     className="px-8 py-3 bg-[#001f3f] text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#d4af37] transition-colors"
                   >
-                    Découvrir la collection
+                    {t('exploreCollection')}
                   </button>
                 </div>
               ) : (
@@ -174,8 +176,12 @@ export default function CartSidebar() {
                      </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">Livraison Gratuite</p>
-                    <p className="text-[10px] font-bold text-gray-400">Taxes incluses</p>
+                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-1">
+                        {t('freeDelivery')}
+                    </p>
+                    <p className="text-[10px] font-bold text-gray-400">
+                        {t('taxesIncluded')}
+                    </p>
                   </div>
                 </div>
 
@@ -197,8 +203,8 @@ export default function CartSidebar() {
                     onClick={closeCart}
                     className="w-full py-4 text-gray-400 font-bold hover:text-[#001f3f] transition-colors uppercase tracking-[0.2em] text-[10px] flex items-center justify-center gap-2"
                   >
-                    <ArrowLeft className="w-3 h-3" />
-                    Continuer mes achats
+                    <ArrowLeft className={`w-3 h-3 ${isRTL ? 'rotate-180' : ''}`} />
+                    {t('backToCollection')}
                   </button>
                 </div>
               </div>

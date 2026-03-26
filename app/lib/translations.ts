@@ -139,6 +139,23 @@ export const translations = {
         withExcellence: 'with Excellence.',
         contactSubtitle: 'Have questions about our collection or need assistance? Our dedicated luxury support team is here to ensure your LuxeShopy experience is flawless.',
 
+        // Quick Order & Urgency
+        quickOrderTitle: 'Quick Order',
+        paymentOnDelivery: 'Payment on Delivery',
+        buyNow: 'Buy Now',
+        stockAlert: 'Hurry! Only {count} left {variant}!',
+        recentPurchase: 'Recent Purchase',
+        clientFrom: 'Client from',
+        ago: 'ago',
+        orderNow: 'Order Now',
+        freeDeliveryLabel: 'Free Delivery',
+        payAtReceiptLabel: 'Pay at Receipt',
+        loadingData: 'Loading Data',
+        close: 'Close',
+        taxesIncluded: 'Taxes included',
+        cartItem: 'Item',
+        cartItems: 'Items',
+
         // Cart & Checkout
         shoppingCart: 'Shopping Cart',
         cartEmpty: 'Your cart is empty',
@@ -358,6 +375,23 @@ export const translations = {
         withExcellence: 'avec l\'Excellence.',
         contactSubtitle: 'Vous avez des questions sur notre collection ou avez besoin d\'aide ? Notre équipe de support de luxe dédiée est là pour garantir que votre expérience LuxeShopy soit irréprochable.',
 
+        // Quick Order & Urgency
+        quickOrderTitle: 'Commande Rapide',
+        paymentOnDelivery: 'Paiement à la Livraison',
+        buyNow: 'Acheter Maintenant',
+        stockAlert: 'Attention! Plus que {count} restants {variant}!',
+        recentPurchase: 'Achat récent',
+        clientFrom: 'Client de',
+        ago: 'Il y a',
+        orderNow: 'Commander',
+        freeDeliveryLabel: 'Livraison Gratuite',
+        payAtReceiptLabel: 'Payer à la Réception',
+        loadingData: 'Chargement des données',
+        close: 'Fermer',
+        taxesIncluded: 'Taxes incluses',
+        cartItem: 'Article',
+        cartItems: 'Articles',
+
         // Cart & Checkout
         shoppingCart: 'Panier',
         cartEmpty: 'Votre panier est vide',
@@ -576,6 +610,23 @@ export const translations = {
         getInTouch: 'تواصل',
         withExcellence: 'مع التميز.',
         contactSubtitle: 'هل لديك أسئلة حول مجموعتنا أو تحتاج إلى مساعدة؟ فريق دعم الفخامة المخصص لدينا هنا لضمان أن تكون تجربتك في LuxeShopy مثالية.',
+
+        // Quick Order & Urgency
+        quickOrderTitle: 'طلب سريع',
+        paymentOnDelivery: 'الدفع عند الاستلام',
+        buyNow: 'اشتري الآن',
+        stockAlert: 'عجّل! بقيت فقط {count} قطع {variant}!',
+        recentPurchase: 'عملية شراء حديثة',
+        clientFrom: 'عميل من',
+        ago: 'منذ',
+        orderNow: 'اطلب الآن',
+        freeDeliveryLabel: 'توصيل مجاني',
+        payAtReceiptLabel: 'الدفع عند الاستلام',
+        loadingData: 'جاري التحميل',
+        close: 'إغلاق',
+        taxesIncluded: 'شامل الضرائب',
+        cartItem: 'سلعة',
+        cartItems: 'سلع',
 
         // Cart & Checkout
         shoppingCart: 'عربة التسوق',

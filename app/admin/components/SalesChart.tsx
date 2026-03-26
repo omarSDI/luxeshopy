@@ -34,11 +34,11 @@ export default function SalesChart({ data }: SalesChartProps) {
   }
 
   return (
-    <div className="h-[400px] w-full mt-4">
+    <div className="h-[400px] w-full mt-4 flex-1 min-h-[400px]">
       {!mounted ? (
-        <div className="w-full h-full bg-gray-50 animate-pulse rounded-3xl" />
+        <div className="w-full h-[400px] bg-gray-50 animate-pulse rounded-3xl" />
       ) : (
-        <ResponsiveContainer width="100%" height="100%" minHeight={350}>
+        <ResponsiveContainer width="100%" height="100%" minHeight={400}>
           <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
