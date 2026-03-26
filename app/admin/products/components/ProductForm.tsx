@@ -167,8 +167,8 @@ export default function ProductForm({ product }: ProductFormProps) {
       return;
     }
 
-    const sanitizeUrl = (url: string) => {
-      if (!url) return url;
+    const sanitizeUrl = (url: string | null | undefined): string => {
+      if (!url) return "";
       if (url.includes('/storage/v1/object/') && !url.includes('/public/')) {
           return url.replace('/storage/v1/object/', '/storage/v1/object/public/');
       }
@@ -201,16 +201,13 @@ export default function ProductForm({ product }: ProductFormProps) {
           }
         }
 
-        // 2. Map final image URLs to variants if they were linked by proxy
+        // 2. Map final image URLs to variants
         const finalVariants = variants.map(v => {
-          // If a variant image was a blob URL, we should update it to the public URL
-          const galleryItem = gallery.find(g => g.url === v.image_url);
-          if (galleryItem?.type === 'upload' && galleryItem.file) {
-            // Find the matching public URL in finalImages by matching the filename or order
-            // Simplified: we'll match it during the upload loop later if needed, 
-            // but let's just make sure it's updated.
+          const galleryIndex = gallery.findIndex(g => g.url === v.image_url);
+          if (galleryIndex !== -1) {
+            return { ...v, image_url: sanitizeUrl(finalImages[galleryIndex]) };
           }
-          return v;
+          return { ...v, image_url: sanitizeUrl(v.image_url) };
         });
 
         const productData = {
